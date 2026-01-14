@@ -1,0 +1,458 @@
+"use strict";
+/**
+ * FOST CLI - Command Line Interface for SDK Generation
+ * Handles command parsing, execution, and output formatting
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CLIApplication = void 0;
+exports.runCLI = runCLI;
+const generator_api_1 = require("../api/generator-api");
+const progress_reporter_1 = require("./progress-reporter");
+const logger_1 = require("./logger");
+const argument_parser_1 = require("./argument-parser");
+class CLIApplication {
+    constructor(argv) {
+        this.args = argv || process.argv.slice(2);
+        this.logger = (0, logger_1.createLogger)();
+        this.progress = (0, progress_reporter_1.createProgressReporter)();
+        this.api = (0, generator_api_1.createGeneratorAPI)();
+    }
+    /**
+     * Main CLI entry point
+     */
+    async run() {
+        try {
+            const { command, options } = (0, argument_parser_1.parseArguments)(this.args);
+            // Configure logging based on options
+            this.logger.configure({
+                level: options.verbose ? "debug" : options.quiet ? "error" : "info",
+                colorize: options.color !== false,
+                format: options.json ? "json" : "text",
+            });
+            // Route to appropriate command handler
+            switch (command) {
+                case "generate":
+                    await this.handleGenerate(options);
+                    break;
+                case "validate":
+                    await this.handleValidate(options);
+                    break;
+                case "test":
+                    await this.handleTest(options);
+                    break;
+                case "lint":
+                    await this.handleLint(options);
+                    break;
+                case "config":
+                    await this.handleConfig(options);
+                    break;
+                case "completion":
+                    await this.handleCompletion(options);
+                    break;
+                case "version":
+                case "-v":
+                case "--version":
+                    this.handleVersion();
+                    break;
+                case "help":
+                case "-h":
+                case "--help":
+                case undefined:
+                    this.handleHelp(options.command);
+                    break;
+                default:
+                    this.logger.error(`Unknown command: ${command}`);
+                    process.exit(2);
+            }
+            process.exit(0);
+        }
+        catch (error) {
+            this.handleError(error);
+        }
+    }
+    /**
+     * Handle generate command
+     */
+    async handleGenerate(options) {
+        // Validate required options
+        if (!options.input) {
+            this.logger.error("--input is required");
+            this.logger.info("Example: sdkgen generate --input api.json --lang typescript --type web2");
+            process.exit(2);
+        }
+        if (!options.language && !options.lang) {
+            this.logger.error("--language (or -l) is required");
+            process.exit(2);
+        }
+        if (!options.type) {
+            this.logger.error("--type is required (web2 or web3)");
+            process.exit(2);
+        }
+        const language = options.language || options.lang;
+        const output = options.output || options.o || "./sdk";
+        // Validation only mode
+        if (options.validateOnly) {
+            this.logger.info("Validating input specification...");
+            const validation = await this.api.validate({
+                inputFile: options.input,
+                type: options.type,
+                strict: options.strict,
+            });
+            if (!validation.valid) {
+                this.logger.error("Validation failed:");
+                validation.errors.forEach((err) => {
+                    this.logger.error(`  - ${err.message}`);
+                });
+                process.exit(3);
+            }
+            this.logger.success("Validation passed!");
+            return;
+        }
+        // Standard generation
+        this.progress.start();
+        try {
+            const config = options.config ? (0, argument_parser_1.parseConfig)(options.config) : {};
+            this.progress.update("Validating input...", 10);
+            const validation = await this.api.validate({
+                inputFile: options.input,
+                type: options.type,
+                strict: options.strict,
+            });
+            if (!validation.valid) {
+                this.progress.fail();
+                this.logger.error("Input validation failed:");
+                validation.errors.forEach((err) => {
+                    this.logger.error(`  ${err.code}: ${err.message}`);
+                    if (err.suggestion) {
+                        this.logger.info(`  Suggestion: ${err.suggestion}`);
+                    }
+                });
+                process.exit(3);
+            }
+            this.progress.update("Analyzing schema...", 25);
+            const analysis = await this.api.analyzeInput({
+                inputFile: options.input,
+                type: options.type,
+            });
+            this.progress.update("Generating code...", 45);
+            const generation = await this.api.generate({
+                inputFile: options.input,
+                language,
+                type: options.type,
+                outputPath: output,
+                name: options.name,
+                version: options.version,
+                config: {
+                    ...config,
+                    includeTests: !options.skipTests,
+                    includeDocumentation: !options.skipDocs,
+                },
+            });
+            if (!options.skipTests) {
+                this.progress.update("Generating tests...", 70);
+                await this.api.generateTests({
+                    outputPath: output,
+                    language,
+                    type: options.type,
+                });
+            }
+            if (!options.skipDocs) {
+                this.progress.update("Generating documentation...", 85);
+                await this.api.generateDocumentation({
+                    outputPath: output,
+                    analysis,
+                });
+            }
+            this.progress.update("Finalizing...", 95);
+            await this.api.validateGeneration({
+                outputPath: output,
+            });
+            this.progress.succeed(`Successfully generated SDK in ${output}\n` +
+                `  - ${generation.filesGenerated} files created\n` +
+                `  - ${analysis.methods} methods\n` +
+                `  - ${analysis.types} types\n` +
+                `  - Generated in ${generation.duration}`);
+            if (options.verbose) {
+                this.logger.info("\nGeneration details:");
+                this.logger.info(`  Output: ${output}`);
+                this.logger.info(`  Language: ${language}`);
+                this.logger.info(`  Type: ${options.type}`);
+                this.logger.info(`  Methods: ${analysis.methods}`);
+                this.logger.info(`  Types: ${analysis.types}`);
+            }
+            if (options.json) {
+                console.log(JSON.stringify({
+                    success: true,
+                    outputPath: output,
+                    filesGenerated: generation.filesGenerated,
+                    duration: generation.duration,
+                    metadata: {
+                        language,
+                        type: options.type,
+                        methods: analysis.methods,
+                        types: analysis.types,
+                    },
+                }, null, 2));
+            }
+        }
+        catch (error) {
+            this.progress.fail();
+            this.logger.error(`Generation failed: ${error.message}`);
+            if (options.verbose || options.debug) {
+                this.logger.error(error.stack);
+            }
+            process.exit(4);
+        }
+    }
+    /**
+     * Handle validate command
+     */
+    async handleValidate(options) {
+        if (!options.input) {
+            this.logger.error("--input is required");
+            process.exit(2);
+        }
+        const type = options.type || "web2";
+        try {
+            this.progress.start();
+            this.progress.update("Validating specification...", 50);
+            const result = await this.api.validate({
+                inputFile: options.input,
+                type,
+                strict: options.strict,
+                customRules: options.rules,
+            });
+            if (result.valid) {
+                this.progress.succeed(`Validation passed!\n  - File: ${options.input}\n  - Type: ${type}`);
+            }
+            else {
+                this.progress.fail();
+                this.logger.error("Validation failed:");
+                result.errors.forEach((err) => {
+                    this.logger.error(`  [${err.code}] ${err.message}`);
+                    if (err.location) {
+                        this.logger.error(`    Location: ${err.location}`);
+                    }
+                    if (err.suggestion) {
+                        this.logger.error(`    Suggestion: ${err.suggestion}`);
+                    }
+                });
+                process.exit(3);
+            }
+            if (options.json) {
+                console.log(JSON.stringify(result, null, 2));
+            }
+        }
+        catch (error) {
+            this.progress.fail();
+            this.logger.error(`Validation error: ${error.message}`);
+            process.exit(1);
+        }
+    }
+    /**
+     * Handle test command
+     */
+    async handleTest(options) {
+        const path = options.path || "./sdk";
+        const testType = options.type || "all";
+        try {
+            this.progress.start();
+            this.progress.update("Running tests...", 30);
+            const result = await this.api.runTests({
+                sdkPath: path,
+                testType,
+                coverage: options.coverage,
+                watch: options.watch,
+            });
+            if (result.allPassed) {
+                this.progress.succeed(`All tests passed!\n` +
+                    `  - Tests: ${result.totalTests}\n` +
+                    `  - Passed: ${result.passedTests}\n` +
+                    `  - Coverage: ${result.coverage}%`);
+            }
+            else {
+                this.progress.fail();
+                this.logger.error(`${result.failedTests} test(s) failed:`);
+                result.failures.forEach((failure) => {
+                    this.logger.error(`  - ${failure.test}: ${failure.error}`);
+                });
+                process.exit(1);
+            }
+            if (options.json) {
+                console.log(JSON.stringify(result, null, 2));
+            }
+        }
+        catch (error) {
+            this.progress.fail();
+            this.logger.error(`Test execution failed: ${error.message}`);
+            process.exit(1);
+        }
+    }
+    /**
+     * Handle lint command
+     */
+    async handleLint(options) {
+        const path = options.path || "./sdk";
+        try {
+            this.progress.start();
+            this.progress.update("Linting code...", 50);
+            const result = await this.api.lintCode({
+                sdkPath: path,
+                fix: options.fix,
+                strict: options.strict,
+            });
+            if (result.issues.length === 0) {
+                this.progress.succeed("No linting issues found!");
+            }
+            else {
+                if (options.fix) {
+                    this.progress.succeed(`Fixed ${result.fixedCount} issue(s), ${result.issues.length} remaining`);
+                }
+                else {
+                    this.progress.warn(`Found ${result.issues.length} linting issue(s):\n` +
+                        result.issues.slice(0, 5).map((issue) => `  - ${issue.file}: ${issue.message}`).join("\n"));
+                }
+            }
+            if (options.json) {
+                console.log(JSON.stringify(result, null, 2));
+            }
+        }
+        catch (error) {
+            this.progress.fail();
+            this.logger.error(`Linting failed: ${error.message}`);
+            process.exit(1);
+        }
+    }
+    /**
+     * Handle config command
+     */
+    async handleConfig(options) {
+        const subcommand = options.subcommand || "show";
+        try {
+            switch (subcommand) {
+                case "show":
+                    const current = await this.api.getConfig();
+                    this.logger.info("Current configuration:");
+                    console.log(JSON.stringify(current, null, 2));
+                    break;
+                case "set":
+                    if (!options.key || !options.value) {
+                        this.logger.error("Usage: sdkgen config set <key> <value>");
+                        process.exit(2);
+                    }
+                    await this.api.setConfig(options.key, options.value);
+                    this.logger.success(`Set ${options.key} = ${options.value}`);
+                    break;
+                case "list":
+                    const allConfigs = await this.api.getConfig();
+                    this.logger.info("Available configurations:");
+                    Object.entries(allConfigs).forEach(([key, value]) => {
+                        this.logger.info(`  ${key}: ${JSON.stringify(value)}`);
+                    });
+                    break;
+                case "reset":
+                    await this.api.resetConfig();
+                    this.logger.success("Configuration reset to defaults");
+                    break;
+                default:
+                    this.logger.error(`Unknown config subcommand: ${subcommand}`);
+                    process.exit(2);
+            }
+        }
+        catch (error) {
+            this.logger.error(`Config error: ${error.message}`);
+            process.exit(1);
+        }
+    }
+    /**
+     * Handle completion command
+     */
+    async handleCompletion(options) {
+        const shell = options.shell || "bash";
+        const completion = await this.api.getCompletion(shell);
+        console.log(completion);
+    }
+    /**
+     * Handle version command
+     */
+    handleVersion() {
+        const version = require("../../package.json").version;
+        console.log(`sdkgen ${version}`);
+    }
+    /**
+     * Handle help command
+     */
+    handleHelp(command) {
+        if (command) {
+            this.logger.info(`Help for command: ${command}`);
+            // Show specific command help
+        }
+        else {
+            console.log(`
+FOST SDK Generator CLI
+
+Usage: sdkgen <command> [options]
+
+Commands:
+  generate    Generate SDK from specification
+  validate    Validate input specification
+  test        Run generated SDK tests
+  lint        Lint generated code
+  config      Manage configuration
+  version     Show version
+  help        Show this help
+
+Options:
+  -h, --help      Show help
+  -v, --version   Show version
+  --verbose       Verbose output
+  -q, --quiet     Quiet output
+  --color         Enable colored output (default: true)
+  --json          Output as JSON
+
+Examples:
+  sdkgen generate --input api.json --lang typescript --type web2
+  sdkgen validate --input openapi.yaml
+  sdkgen test --path ./generated-sdk --coverage
+  sdkgen lint --path ./generated-sdk --fix
+
+Documentation: https://docs.fost.dev/cli
+      `);
+        }
+    }
+    /**
+     * Handle errors
+     */
+    handleError(error) {
+        if (error.code === "ERR_INVALID_ARG_VALUE") {
+            this.logger.error(`Invalid argument: ${error.message}`);
+            process.exit(2);
+        }
+        if (error.code === "ENOENT") {
+            this.logger.error(`File not found: ${error.path}`);
+            process.exit(5);
+        }
+        if (error.code === "EACCES") {
+            this.logger.error(`Permission denied: ${error.path}`);
+            process.exit(5);
+        }
+        this.logger.error(`${error.message}`);
+        process.exit(1);
+    }
+}
+exports.CLIApplication = CLIApplication;
+/**
+ * CLI Entry point
+ */
+async function runCLI(argv) {
+    const cli = new CLIApplication(argv);
+    await cli.run();
+}
+// Execute if run directly
+if (require.main === module) {
+    runCLI().catch((error) => {
+        console.error(error);
+        process.exit(1);
+    });
+}
+//# sourceMappingURL=index.js.map

@@ -5,6 +5,19 @@
  * These types bridge from Canonical Schema to generated code.
  */
 
+import {
+  Web3ReadOperation,
+  Web3WriteOperation,
+  TransactionLifecycle,
+  ConfirmationStrategy,
+  GasEstimate,
+  WalletConnection,
+  WalletConnectionState,
+  BlockchainNetwork,
+  SmartContractEventSubscription,
+  SigningRequest,
+} from "../../WEB3_SCHEMA_EXTENSIONS";
+
 // ============================================================================
 // SDK DESIGN PLAN - Input to Code Generation
 // ============================================================================
@@ -558,4 +571,297 @@ export interface ASTFunctionDeclaration extends ASTStatement {
   isAsync: boolean;
   isExported: boolean;
   documentation?: string;
+}
+// ============================================================================
+// WEB3 SDK DESIGN PLAN EXTENSIONS
+// ============================================================================
+
+/**
+ * Web3-specific SDK design plan
+ * Extends SDKDesignPlan with blockchain-specific generation directives
+ */
+export interface Web3SDKDesignPlan extends SDKDesignPlan {
+  /** Web3-specific configuration */
+  web3: {
+    /** Primary blockchain this SDK targets */
+    primaryChain: BlockchainNetwork;
+
+    /** All supported blockchains */
+    supportedChains: BlockchainNetwork[];
+
+    /** Wallet connection strategy */
+    walletIntegration: {
+      autoConnect: boolean;
+      connectorOptions: {
+        walletType: "injected" | "qrcode" | "walletconnect" | "coinbase" | "ethers";
+        displayName: string;
+      }[];
+    };
+
+    /** Transaction confirmation strategy */
+    confirmationStrategy: ConfirmationStrategy;
+
+    /** Whether to auto-estimate gas before transaction submission */
+    autoGasEstimation: boolean;
+
+    /** Whether to allow user to customize gas */
+    userCustomizableGas: boolean;
+
+    /** Event subscription method */
+    eventSubscriptionMethod: "websocket" | "polling" | "graphql";
+
+    /** Whether to expose low-level provider methods */
+    exposeLowLevelProvider: boolean;
+
+    /** Whether to generate contract type bindings */
+    generateContractBindings: boolean;
+
+    /** Contract ABIs to generate bindings for */
+    contracts: {
+      name: string;
+      abi: string; // JSON stringified ABI
+      address?: Record<string, string>; // chainId -> address
+    }[];
+
+    /** Whether to generate multi-chain deployment helpers */
+    generateDeploymentHelpers: boolean;
+
+    /** Whether to include mock provider for testing */
+    includeMockProvider: boolean;
+
+    /** Retry and resilience settings */
+    resilience: {
+      rpcFailoverEnabled: boolean;
+      maxRpcRetries: number;
+      rpcRetryBackoffMs: number;
+      blockReorgDetection: boolean;
+    };
+  };
+}
+
+/**
+ * Web3-specific method to generate
+ */
+export interface Web3SDKMethod extends SDKMethod {
+  /** Whether this is a read or write operation */
+  operationType: "read" | "write";
+
+  /** For read operations: whether to cache results */
+  caching?: {
+    enabled: boolean;
+    ttlMs: number;
+  };
+
+  /** For write operations: gas estimation info */
+  gasEstimation?: {
+    available: boolean;
+    method: string;
+  };
+
+  /** For write operations: confirmation requirements */
+  confirmation?: {
+    blockConfirmations: number;
+    timeoutMs: number;
+  };
+
+  /** Smart contract details */
+  smartContract?: {
+    address: string; // Can be parameterized like {address}
+    method: string;
+    methodSignature: string;
+    isPayable: boolean;
+  };
+
+  /** Transaction details if write operation */
+  transaction?: {
+    canEstimateGas: boolean;
+    userCanSetGas: boolean;
+    userCanSetGasPrice: boolean;
+    incrementsNonce: boolean;
+  };
+
+  /** Event details if subscribing */
+  event?: {
+    contractAddress: string;
+    eventSignature: string;
+    indexed: string[];
+  };
+}
+
+/**
+ * Configuration for generating contract bindings
+ */
+export interface ContractBindingConfig {
+  /** Contract name */
+  contractName: string;
+
+  /** Contract ABI (JSON) */
+  abi: string;
+
+  /** Addresses by chain ID */
+  addresses: Record<string, string>;
+
+  /** Functions to expose in SDK */
+  functions: {
+    name: string;
+    readonly: boolean; // view/pure vs state-changing
+  }[];
+
+  /** Events to listen for */
+  events: {
+    name: string;
+    indexed: string[];
+  }[];
+
+  /** Whether to generate factory method for creating instances */
+  generateFactory: boolean;
+
+  /** Whether to generate batch call helper */
+  generateBatchCaller: boolean;
+}
+
+/**
+ * Configuration for wallet integration code generation
+ */
+export interface WalletIntegrationConfig {
+  /** Which wallets to support */
+  supportedWallets: {
+    type: "metamask" | "walletconnect" | "coinbase" | "phantom" | "injected";
+    packageName?: string;
+    displayName: string;
+  }[];
+
+  /** Whether to auto-detect and connect to last used wallet */
+  autoReconnect: boolean;
+
+  /** Whether to request permissions on init */
+  requestPermissions: boolean;
+
+  /** Signer type to use */
+  signerType: "ethers" | "web3js" | "viem";
+
+  /** Whether to expose raw signer */
+  exposeRawSigner: boolean;
+
+  /** Chain switching behavior */
+  chainSwitching: {
+    autoSwitch: boolean;
+    showSwitchPrompt: boolean;
+    supportedChains: string[];
+  };
+}
+
+/**
+ * Configuration for transaction monitoring code generation
+ */
+export interface TransactionMonitoringConfig {
+  /** How to check transaction confirmation */
+  confirmationMethod: "polling" | "websocket" | "event_logs";
+
+  /** For polling: check interval */
+  pollingIntervalMs: number;
+
+  /** For polling: max wait time */
+  maxWaitMs: number;
+
+  /** Whether to track transaction state through lifecycle */
+  trackFullLifecycle: boolean;
+
+  /** Whether to emit events for state changes */
+  emitLifecycleEvents: boolean;
+
+  /** Whether to detect and handle block reorgs */
+  detectReorgs: boolean;
+
+  /** Whether to auto-retry dropped transactions */
+  autoRetryDropped: boolean;
+
+  /** Max retries for dropped transactions */
+  maxRetries: number;
+}
+
+/**
+ * Configuration for event subscription code generation
+ */
+export interface EventSubscriptionConfig {
+  /** How to subscribe to events */
+  method: "websocket" | "polling" | "graphql";
+
+  /** For polling: interval */
+  pollingIntervalMs?: number;
+
+  /** Whether to track subscription state */
+  trackSubscriptionState: boolean;
+
+  /** Whether to emit subscription lifecycle events */
+  emitSubscriptionEvents: boolean;
+
+  /** Whether to support event filtering */
+  supportFiltering: boolean;
+
+  /** Max concurrent subscriptions */
+  maxConcurrentSubscriptions: number;
+
+  /** Whether to handle reorg for historical events */
+  handleReorgs: boolean;
+
+  /** Batch event delivery if supported */
+  batchEvents: boolean;
+  batchSizeMs?: number;
+}
+
+/**
+ * Configuration for error handling code generation
+ */
+export interface Web3ErrorHandlingConfig {
+  /** Whether to generate Web3-specific error types */
+  generateWeb3Errors: boolean;
+
+  /** Whether to auto-classify errors */
+  autoClassifyErrors: boolean;
+
+  /** Whether to suggest recovery actions */
+  suggestRecoveryActions: boolean;
+
+  /** Error categories to handle specially */
+  specialCases: {
+    insufficientFunds: {
+      suggestFaucet: boolean;
+      suggestBridge: boolean;
+    };
+    wrongChain: {
+      autoSuggestSwitch: boolean;
+      showSupportedChains: boolean;
+    };
+    gasPrice: {
+      suggestGasPriceOptions: boolean;
+      showHistorical: boolean;
+    };
+  };
+}
+
+/**
+ * Configuration for generating test helpers
+ */
+export interface Web3TestingConfig {
+  /** Whether to generate mock provider */
+  generateMockProvider: boolean;
+
+  /** Which test framework to target */
+  testFramework: "jest" | "mocha" | "hardhat" | "truffle" | "foundry";
+
+  /** Whether to generate contract mocks */
+  generateContractMocks: boolean;
+
+  /** Whether to generate transaction fixtures */
+  generateTransactionFixtures: boolean;
+
+  /** Whether to generate wallet mocks */
+  generateWalletMocks: boolean;
+
+  /** Whether to generate chain/network mocks */
+  generateNetworkMocks: boolean;
+
+  /** Local blockchain for testing */
+  localBlockchain?: "hardhat" | "ganache" | "anvil" | "mock";
 }
