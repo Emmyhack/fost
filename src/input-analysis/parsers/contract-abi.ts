@@ -19,8 +19,8 @@ import {
   NormalizedSmartContract,
   NormalizedABIFunction,
   NormalizedABIEvent,
-} from "./types";
-import { BaseParser } from "./base-parser";
+} from "../types";
+import { BaseParser } from "../base-parser";
 
 export class ContractABIParser extends BaseParser {
   canParse(input: InputSpec): boolean {
@@ -296,6 +296,9 @@ export class ContractABIParser extends BaseParser {
     const contract: NormalizedSmartContract = {
       name: contractName,
       abi: {},
+      constructor: {
+        inputs: [],
+      },
     };
 
     abi.forEach((item) => {

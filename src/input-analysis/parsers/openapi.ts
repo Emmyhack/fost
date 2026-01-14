@@ -17,7 +17,7 @@ import {
   NormalizedNetwork,
   ParserResult,
   InputSourceInfo,
-} from "./types";
+} from "../types";
 import {
   BaseParser,
   extractRequiredFields,
@@ -27,7 +27,7 @@ import {
   classifyParameterLocation,
   flattenRefPath,
   isFieldRequired,
-} from "./base-parser";
+} from "../base-parser";
 
 export class OpenAPIParser extends BaseParser {
   canParse(input: InputSpec): boolean {
@@ -436,7 +436,7 @@ export class OpenAPIParser extends BaseParser {
 
     // Collect all error codes from operations
     operations.forEach((op) => {
-      op.errors.forEach((code) => errorCodes.add(code));
+      op.errors.forEach((code: string) => errorCodes.add(code));
     });
 
     // Create error definitions

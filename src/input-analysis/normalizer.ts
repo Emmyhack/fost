@@ -15,10 +15,10 @@ import {
 import { OpenAPIParser } from "./parsers/openapi";
 import { ContractABIParser } from "./parsers/contract-abi";
 import { ChainMetadataParser } from "./parsers/chain-metadata";
-import { SpecParser } from "./base-parser";
+import { BaseParser } from "./base-parser";
 
 export class InputNormalizer {
-  private parsers: SpecParser[] = [];
+  private parsers: BaseParser[] = [];
 
   constructor() {
     // Register all built-in parsers
@@ -30,7 +30,7 @@ export class InputNormalizer {
   /**
    * Register a custom parser
    */
-  registerParser(parser: SpecParser): void {
+  registerParser(parser: BaseParser): void {
     this.parsers.push(parser);
   }
 
@@ -79,7 +79,7 @@ export class InputNormalizer {
         error: `Validation failed: ${validationResult.errors[0].message}`,
         validationErrors: validationResult.errors,
         warnings: [...parseResult.warnings, ...validationResult.warnings.map((w) => ({
-          level: w.severity === "major" ? "error" : "warning" as const,
+          level: w.severity === "major" ? ("error" as const) : ("warning" as const),
           code: w.code,
           message: w.message,
           location: w.path,
@@ -92,7 +92,7 @@ export class InputNormalizer {
       success: true,
       spec: parseResult.normalized,
       warnings: [...parseResult.warnings, ...validationResult.warnings.map((w) => ({
-        level: w.severity === "major" ? "warning" as const : "info",
+        level: w.severity === "major" ? ("error" as const) : ("warning" as const),
         code: w.code,
         message: w.message,
         location: w.path,

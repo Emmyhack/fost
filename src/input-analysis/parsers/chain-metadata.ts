@@ -12,8 +12,8 @@ import {
   NormalizedNetwork,
   ParserResult,
   NormalizedChainMetadata,
-} from "./types";
-import { BaseParser } from "./base-parser";
+} from "../types";
+import { BaseParser } from "../base-parser";
 
 export class ChainMetadataParser extends BaseParser {
   canParse(input: InputSpec): boolean {
