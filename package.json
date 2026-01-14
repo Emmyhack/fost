@@ -1,15 +1,51 @@
 {
   "name": "fost",
   "version": "0.1.0",
-  "description": "Framework for Optimized SDK generation using Type analysis",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "description": "AI-powered SDK generator for Web2 and Web3 APIs. Generate fully-typed, documented SDKs in minutes from OpenAPI, GraphQL, or smart contract ABIs.",
+  "main": "dist/src/cli/index.js",
+  "types": "dist/src/cli/index.d.ts",
+  "bin": {
+    "fost": "./bin/fost.js"
+  },
+  "files": [
+    "dist/",
+    "bin/",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
     "test": "jest",
     "lint": "eslint src",
-    "cli": "node dist/cli/index.js"
+    "cli": "node dist/cli/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "sdk",
+    "generator",
+    "ai",
+    "openapi",
+    "graphql",
+    "web3",
+    "smart-contracts",
+    "typescript",
+    "cli",
+    "code-generation"
+  ],
+  "author": "Emmyhack",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Emmyhack/fost.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Emmyhack/fost/issues"
+  },
+  "homepage": "https://github.com/Emmyhack/fost#readme",
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {},
   "devDependencies": {

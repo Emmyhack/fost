@@ -1,0 +1,17 @@
+{
+  "folders": [
+    {
+      "path": "landing"
+    },
+    {
+      "path": "src"
+    }
+  ],
+  "settings": {
+    "css.lint.unknownAtRules": "ignore",
+    "css.validate": false,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    }
+  }
+}

@@ -84,7 +84,7 @@ export class CLIApplication {
     // Validate required options
     if (!options.input) {
       this.logger.error("--input is required");
-      this.logger.info("Example: sdkgen generate --input api.json --lang typescript --type web2");
+      this.logger.info("Example: fost generate --input api.json --lang typescript --type web2");
       process.exit(2);
     }
 
@@ -383,7 +383,7 @@ export class CLIApplication {
 
         case "set":
           if (!options.key || !options.value) {
-            this.logger.error("Usage: sdkgen config set <key> <value>");
+            this.logger.error("Usage: fost config set <key> <value>");
             process.exit(2);
           }
           await this.api.setConfig(options.key, options.value);
@@ -427,7 +427,7 @@ export class CLIApplication {
    */
   private handleVersion(): void {
     const version = require("../../package.json").version;
-    console.log(`sdkgen ${version}`);
+    console.log(`fost ${version}`);
   }
 
   /**
@@ -441,7 +441,7 @@ export class CLIApplication {
       console.log(`
 FOST SDK Generator CLI
 
-Usage: sdkgen <command> [options]
+Usage: fost <command> [options]
 
 Commands:
   generate    Generate SDK from specification
@@ -461,10 +461,10 @@ Options:
   --json          Output as JSON
 
 Examples:
-  sdkgen generate --input api.json --lang typescript --type web2
-  sdkgen validate --input openapi.yaml
-  sdkgen test --path ./generated-sdk --coverage
-  sdkgen lint --path ./generated-sdk --fix
+  fost generate --input api.json --lang typescript --type web2
+  fost validate --input openapi.yaml
+  fost test --path ./generated-sdk --coverage
+  fost lint --path ./generated-sdk --fix
 
 Documentation: https://docs.fost.dev/cli
       `);

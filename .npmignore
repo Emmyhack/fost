@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+npm-debug.log
+
+# Build
+.next/
+dist/src/**/*.map
+dist/**/*.d.ts.map
+
+# Development
+.git
+.gitignore
+.vscode
+.eslintrc
+tsconfig.json
+jest.config.js
+
+# Landing site
+landing/
+public/
+
+# Documentation
+ARCHITECTURE.md
+CODE_GENERATION_ARCHITECTURE.md
+LLM_OPERATIONS_STRATEGY.md
+DELIVERY_SUMMARY.md
+COMPREHENSIVE_AUDIT_REPORT.md
+PROJECT_BRANDING_AUDIT.md
+PROJECT_STATUS.md
+WEB3_INDEX.md
+BUTTON_AUDIT.md
+
+# Examples
+EXAMPLE_UNISWAP_V4_SDK.ts
+WEB3_SCHEMA_EXTENSIONS.ts
+WEB3_SDK_USAGE_PATTERNS.ts
+CANONICAL_SCHEMA.ts
+
+# Test files
+**/*.test.ts
+**/*.spec.ts
+
+# IDE
+*.swp
+*.swo
+*~
+.DS_Store

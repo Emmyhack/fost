@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+npm-debug.log
+*.lock
+
+# Build outputs
+dist/src/**/*.map
+dist/**/*.d.ts.map
+.next/
+.vercel/
+
+# Development
+.vscode/
+.env
+.env.local
+.env.*.local
+
+# IDE
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-workspace
+*.sublime-project
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Landing site build artifacts
+landing/.next/
+landing/node_modules/
+landing/dist/
+landing/.env.local
+landing/package-lock.json
+
+# Root node_modules should also be ignored in some cases
+# but keeping it tracked as optional based on project needs
