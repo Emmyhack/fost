@@ -25,21 +25,21 @@ export class ClientClassBuilder {
       {
         type: "PropertyDeclaration",
         name: "private config",
-        type: "ClientConfig",
+        valueType: "ClientConfig",
         readonly: false,
         isPrivate: true,
       },
       {
         type: "PropertyDeclaration",
         name: "private httpClient",
-        type: "any",
+        valueType: "any",
         readonly: false,
         isPrivate: true,
       },
       {
         type: "PropertyDeclaration",
         name: "private authHandler",
-        type: "AuthHandler | null",
+        valueType: "AuthHandler | null",
         readonly: false,
         isPrivate: true,
       },
@@ -217,21 +217,21 @@ export class ErrorTypeBuilder {
         {
           type: "PropertyDeclaration",
           name: "code",
-          type: "string",
+          valueType: "string",
           readonly: true,
           isPrivate: false,
         },
         {
           type: "PropertyDeclaration",
           name: "statusCode",
-          type: "number | undefined",
+          valueType: "number | undefined",
           readonly: true,
           isPrivate: false,
         },
         {
           type: "PropertyDeclaration",
           name: "context",
-          type: "Record<string, any>",
+          valueType: "Record<string, any>",
           readonly: true,
           isPrivate: false,
         },
@@ -402,7 +402,7 @@ export class ErrorTypeBuilder {
         {
           type: "PropertyDeclaration",
           name: "requestId",
-          type: "string | undefined",
+          valueType: "string | undefined",
           readonly: true,
           isPrivate: false,
         },
@@ -473,48 +473,42 @@ export class ConfigurationBuilder {
         {
           type: "PropertyDeclaration",
           name: "apiKey",
-          type: "string",
-          required: true,
+          valueType: "string",
           readonly: false,
           isPrivate: false,
         },
         {
           type: "PropertyDeclaration",
           name: "baseUrl",
-          type: "string",
-          required: false,
+          valueType: "string",
           readonly: false,
           isPrivate: false,
         },
         {
           type: "PropertyDeclaration",
           name: "timeout",
-          type: "number",
-          required: false,
+          valueType: "number",
           readonly: false,
           isPrivate: false,
         },
         {
           type: "PropertyDeclaration",
           name: "authType",
-          type: '"bearer" | "api-key" | "oauth2"',
-          required: false,
+          valueType: '"bearer" | "api-key" | "oauth2"',
           readonly: false,
           isPrivate: false,
         },
         {
           type: "PropertyDeclaration",
           name: "retryPolicy",
-          type: "RetryPolicy",
-          required: false,
+          valueType: "RetryPolicy",
           readonly: false,
           isPrivate: false,
         },
         {
           type: "PropertyDeclaration",
           name: "logger",
-          type: "Logger | null",
-          required: false,
+          valueType: "Logger | null",
           readonly: false,
           isPrivate: false,
         },
@@ -533,24 +527,21 @@ export class ConfigurationBuilder {
         {
           type: "PropertyDeclaration",
           name: "maxRetries",
-          type: "number",
-          required: true,
+          valueType: "number",
           readonly: false,
           isPrivate: false,
         },
         {
           type: "PropertyDeclaration",
           name: "backoffMultiplier",
-          type: "number",
-          required: true,
+          valueType: "number",
           readonly: false,
           isPrivate: false,
         },
         {
           type: "PropertyDeclaration",
           name: "initialDelayMs",
-          type: "number",
-          required: true,
+          valueType: "number",
           readonly: false,
           isPrivate: false,
         },
@@ -629,18 +620,7 @@ export class MethodBuilder {
       optional: !p.required,
     }));
 
-    const doc = {
-      description: methodPlan.description || `Call ${methodPlan.name}`,
-      params: methodPlan.parameters.map((p: any) => ({
-        name: p.name,
-        type: p.type,
-        description: p.description,
-      })),
-      returns: {
-        type: methodPlan.returns.type,
-        description: `Result from ${methodPlan.name}`,
-      },
-    };
+    const docString = methodPlan.description || `Call ${methodPlan.name}`;
 
     const body: AST.ASTStatement[] = [
       {
@@ -737,7 +717,7 @@ export class MethodBuilder {
       isPrivate: false,
       parameters,
       returnType: methodPlan.returns.type,
-      documentation: doc,
+      documentation: docString,
       body,
     };
   }
@@ -761,12 +741,11 @@ export class TypeDefinitionBuilder {
           typePlan.fields?.map((f: any) => ({
             type: "PropertyDeclaration" as const,
             name: f.name,
-            type: f.type,
-            required: f.required,
+            valueType: f.type,
             readonly: f.readonly || false,
             isPrivate: false,
           })) || [],
-      };
+      } as AST.ASTInterfaceDeclaration;
     } else if (typePlan.kind === "enum") {
       return {
         type: "EnumDeclaration",
@@ -778,7 +757,7 @@ export class TypeDefinitionBuilder {
             name: v.name,
             value: v.value,
           })) || [],
-      };
+      } as AST.ASTEnumDeclaration;
     }
 
     throw new Error(`Unsupported type kind: ${typePlan.kind}`);

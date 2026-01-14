@@ -420,7 +420,7 @@ export interface ASTMethodDeclaration extends ASTNode {
 export interface ASTPropertyDeclaration extends ASTNode {
   type: "PropertyDeclaration";
   name: string;
-  type: string;
+  valueType: string;
   initializer?: ASTExpression;
   readonly: boolean;
   isPrivate: boolean;

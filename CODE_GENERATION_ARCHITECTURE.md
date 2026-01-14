@@ -10,11 +10,11 @@
 
 The SDK Code Generation Layer transforms deterministic SDK Design Plans into production-ready, idiomatic TypeScript code. This layer implements the principle of **no raw string concatenation** through a structured AST-based approach, ensuring generated code is:
 
-- ✅ **Readable** - Properly formatted with consistent style
-- ✅ **Maintainable** - Clear structure and naming conventions
-- ✅ **Testable** - Generated code follows best practices
-- ✅ **Deterministic** - Same input always produces identical output
-- ✅ **Idiomatic** - Follows TypeScript conventions and best practices
+- [100%] **Readable** - Properly formatted with consistent style
+- [100%] **Maintainable** - Clear structure and naming conventions
+- [100%] **Testable** - Generated code follows best practices
+- [100%] **Deterministic** - Same input always produces identical output
+- [100%] **Idiomatic** - Follows TypeScript conventions and best practices
 
 ---
 
@@ -465,14 +465,14 @@ export class PythonEmitter {
 
 ### 7.1 Always Use AST
 
-❌ **Don't:**
+[NOT RECOMMENDED] **Don't:**
 ```typescript
 function generateCode(): string {
   return `const x = 5;\nif (x > 3) { console.log("yes"); }`;
 }
 ```
 
-✅ **Do:**
+[100%] **Do:**
 ```typescript
 function generateCode(): AST.ASTProgram {
   return {

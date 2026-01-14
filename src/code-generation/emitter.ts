@@ -33,7 +33,7 @@ export const DEFAULT_EMITTER_OPTIONS: EmitterOptions = {
  * Code builder with accumulated content and indentation tracking
  */
 export class CodeBuilder {
-  private lines: string[] = [];
+  private lineArray: string[] = [];
   private currentIndent: number = 0;
   private options: EmitterOptions;
 
@@ -57,9 +57,9 @@ export class CodeBuilder {
    */
   line(content: string): this {
     if (content === "") {
-      this.lines.push("");
+      this.lineArray.push("");
     } else {
-      this.lines.push(this.getIndent() + content);
+      this.lineArray.push(this.getIndent() + content);
     }
     return this;
   }
@@ -175,7 +175,7 @@ export class CodeBuilder {
    * Add blank line
    */
   blank(): this {
-    this.lines.push("");
+    this.lineArray.push("");
     return this;
   }
 
@@ -183,7 +183,7 @@ export class CodeBuilder {
    * Get final code
    */
   toString(): string {
-    let code = this.lines.join("\n");
+    let code = this.lineArray.join("\n");
     if (this.options.trailingNewline && !code.endsWith("\n")) {
       code += "\n";
     }
@@ -194,7 +194,7 @@ export class CodeBuilder {
    * Get lines array
    */
   getLines(): string[] {
-    return [...this.lines];
+    return [...this.lineArray];
   }
 }
 
@@ -365,10 +365,10 @@ export class TypeScriptEmitter {
     if (iface.properties && iface.properties.length > 0) {
       iface.properties.forEach((prop) => {
         const optional = prop.readonly ? "readonly " : "";
-        const typeStr = prop.type || "any";
+        const typeStr = prop.valueType || "any";
         const semicolon = this.options.semicolons ? ";" : "";
         builder.line(
-          `${optional}${prop.name}${prop.required ? "" : "?"}: ${typeStr}${semicolon}`
+          `${optional}${prop.name}${prop.readonly ? "" : "?"}: ${typeStr}${semicolon}`
         );
       });
     }

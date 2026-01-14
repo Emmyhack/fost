@@ -65,11 +65,11 @@ Each parser implements the `SpecParser` interface and converts from a specific f
 
 | Format | Parser | Status |
 |--------|--------|--------|
-| OpenAPI 3.0 | `OpenAPIParser` | ✅ |
-| OpenAPI 3.1 | `OpenAPIParser` | ✅ |
-| Swagger 2.0 | `OpenAPIParser` | ✅ |
-| Contract ABI (Solidity) | `ContractABIParser` | ✅ |
-| Chain Metadata | `ChainMetadataParser` | ✅ |
+| OpenAPI 3.0 | `OpenAPIParser` | [DONE] |
+| OpenAPI 3.1 | `OpenAPIParser` | [DONE] |
+| Swagger 2.0 | `OpenAPIParser` | [DONE] |
+| Contract ABI (Solidity) | `ContractABIParser` | [DONE] |
+| Chain Metadata | `ChainMetadataParser` | [DONE] |
 
 **Adding a parser:**
 

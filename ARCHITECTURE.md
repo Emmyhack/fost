@@ -30,7 +30,7 @@ The SDK generation system is a deterministic-first pipeline that:
 - **gRPC Parser** → Proto files → Normalized Spec
 - **Input Validator** → Schema conformance checks
 
-**Deterministic:** ✅ 100% (parsing + validation via schema)  
+**Deterministic:** [100%] (parsing + validation via schema)  
 **Extensible:** New parsers registered in parser registry
 
 ### 2.2 Canonicalization Layer
@@ -45,7 +45,7 @@ The SDK generation system is a deterministic-first pipeline that:
 
 **Output:** `ProductCanonicalIR` (deterministic, language-agnostic)
 
-**Deterministic:** ✅ 100%
+**Deterministic:** [100%]
 
 ### 2.3 Product Classification Engine
 **Responsibility:** Determine SDK generation strategy based on product characteristics.
@@ -56,7 +56,7 @@ The SDK generation system is a deterministic-first pipeline that:
 - **Chain Detector** (Web3) → Ethereum, Solana, Cosmos, etc.
 - **SDK Profile Selector** → Thin wrapper vs. thick SDK vs. domain-specific
 
-**Deterministic:** ✅ 100% (rules-based classification)
+**Deterministic:** [100%] (rules-based classification)
 
 ### 2.4 SDK Design Layer
 **Responsibility:** Create an opinionated SDK design specification for the target language.
@@ -69,8 +69,8 @@ The SDK generation system is a deterministic-first pipeline that:
 - **Design Validator** → Consistency, completeness, adherence to conventions
 
 **Deterministic with LLM Guidance:**
-- **Deterministic:** ✅ Structure, patterns, conventions
-- **LLM-Assisted:** ⚡ API naming refinement, code idiom suggestions
+- **Deterministic:** [100%] Structure, patterns, conventions
+- **LLM-Assisted:** [Partial] API naming refinement, code idiom suggestions
 
 **Output:** `SDKDesignSpec` (blueprint for code generation)
 
@@ -88,8 +88,8 @@ The SDK generation system is a deterministic-first pipeline that:
   - Wallet/signer integration
   - Chain-specific utilities
 
-**Deterministic:** ✅ 95% (template-based code generation)  
-**LLM-Assisted:** ⚡ Complex method implementations, edge case handling
+**Deterministic:** [95%] (template-based code generation)  
+**LLM-Assisted:** [Partial] Complex method implementations, edge case handling
 
 **Output:** Language-specific source files (.ts, .py, .go, etc.)
 
@@ -102,8 +102,8 @@ The SDK generation system is a deterministic-first pipeline that:
 - **Guide Generator** → Setup, auth flows, common patterns
 - **Changelog Generator** → Version notes, breaking changes
 
-**Deterministic:** ✅ 70%  
-**LLM-Driven:** ⚡ 30% (example quality, prose quality, guide structure)
+**Deterministic:** [70%]  
+**LLM-Driven:** [Partial] 30% (example quality, prose quality, guide structure)
 
 **LLM Usage Rationale:** Documentation prose needs human-like quality; examples benefit from creative variation.
 
@@ -116,8 +116,8 @@ The SDK generation system is a deterministic-first pipeline that:
 - **Test Data Generator** → Realistic payloads from spec
 - **Web3-Specific Test Generator** → Transaction simulation, gas estimation
 
-**Deterministic:** ✅ 85%  
-**LLM-Assisted:** ⚡ Test case edge case discovery
+**Deterministic:** [85%]  
+**LLM-Assisted:** [Partial] Test case edge case discovery
 
 ### 2.8 Quality Assurance Layer
 **Responsibility:** Validate all outputs before delivery.
@@ -129,7 +129,7 @@ The SDK generation system is a deterministic-first pipeline that:
 - **Documentation Validator** → Links, code snippets compile
 - **Security Scanner** → No secrets, proper auth handling
 
-**Deterministic:** ✅ 100%
+**Deterministic:** [100%]
 
 ### 2.9 Extensibility Registry
 **Responsibility:** Maintain pluggable components for new languages, chains, patterns.
@@ -140,7 +140,7 @@ The SDK generation system is a deterministic-first pipeline that:
 - **Parser Registry** → Custom spec formats
 - **Generator Registry** → Domain-specific generators (trading SDKs, payment SDKs, etc.)
 
-**Deterministic:** ✅ 100%
+**Deterministic:** [100%]
 
 ---
 

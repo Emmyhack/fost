@@ -34,7 +34,7 @@ This enables:
 
 Parsers work only with what's explicitly defined:
 
-| Implicit Assumption | Wrong ❌ | Explicit ✅ |
+| Implicit Assumption | Wrong [NOT DONE] | Explicit [DONE] |
 |--------------------|---------|-----------|
 | "Status field probably indicates error" | Guess enum values | Error codes explicitly listed |
 | "This field looks like a price" | Assume decimal handling | Type explicitly specified |
@@ -487,14 +487,14 @@ NormalizedSpec {
 
 ## 12. Success Criteria
 
-- ✅ All format-specific parsers implemented
-- ✅ Type reference resolution working
-- ✅ Validation catches all inconsistencies
-- ✅ Error messages are actionable
-- ✅ Zero hallucination (parsing only what's present)
-- ✅ Deterministic output (same input → same output)
-- ✅ Performance < 100ms for typical specs
-- ✅ Full type safety (TypeScript)
+- [DONE] All format-specific parsers implemented
+- [DONE] Type reference resolution working
+- [DONE] Validation catches all inconsistencies
+- [DONE] Error messages are actionable
+- [DONE] Zero hallucination (parsing only what's present)
+- [DONE] Deterministic output (same input → same output)
+- [DONE] Performance < 100ms for typical specs
+- [DONE] Full type safety (TypeScript)
 
 ## 13. Next Phase
 
@@ -507,7 +507,7 @@ NormalizedSpec flows to **Canonicalization Layer**, which:
 
 ---
 
-**Implementation Status:** ✅ Complete
+**Implementation Status:** [COMPLETE]
 - [x] Types defined
 - [x] OpenAPI parser
 - [x] Contract ABI parser

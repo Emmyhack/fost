@@ -30,13 +30,13 @@ Raw API Specs (OpenAPI, ABI, etc.)
 
 ## Key Features
 
-✅ **Deterministic** - Same input always produces identical output  
-✅ **AST-Based** - No raw string concatenation ever  
-✅ **Idiomatic TypeScript** - Follows language best practices  
-✅ **Production-Grade** - Includes error handling, retries, auth  
-✅ **Extensible** - Easy to add new languages or patterns  
-✅ **Well-Documented** - Auto-generates JSDoc for all APIs  
-✅ **Fast** - Generates complete SDKs in < 100ms  
+[100%] **Deterministic** - Same input always produces identical output  
+[100%] **AST-Based** - No raw string concatenation ever  
+[100%] **Idiomatic TypeScript** - Follows language best practices  
+[100%] **Production-Grade** - Includes error handling, retries, auth  
+[100%] **Extensible** - Easy to add new languages or patterns  
+[100%] **Well-Documented** - Auto-generates JSDoc for all APIs  
+[100%] **Fast** - Generates complete SDKs in < 100ms  
 
 ## Quick Start
 
@@ -182,10 +182,10 @@ interface SDKDesignPlan {
 Never write code as strings. Always use AST:
 
 ```typescript
-// ❌ Wrong
+// [NOT DONE] Wrong
 let code = "class Client { method() { ... } }";
 
-// ✅ Right
+// [100%] Right
 const classNode: ASTClassDeclaration = {
   type: "ClassDeclaration",
   name: "Client",
@@ -495,7 +495,7 @@ const result = generator.generate();
 
 ## Best Practices
 
-### ✅ Do
+### [100%] Do
 
 - Use AST nodes for all code representation
 - Validate design plan before generation
@@ -504,7 +504,7 @@ const result = generator.generate();
 - Test generated code compilation
 - Use semantic versioning
 
-### ❌ Don't
+### [NOT RECOMMENDED] Don't
 
 - Concatenate strings to build code
 - Skip error definitions
