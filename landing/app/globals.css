@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Base typography */
+body {
+  @apply font-sans leading-relaxed text-gray-900;
+  letter-spacing: -0.3px;
+  background: transparent;
+}
+
+/* Subtle background pattern overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 1px 1px, rgba(16, 185, 129, 0.015) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Heading hierarchy with refined sizing */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold text-gray-900;
+  letter-spacing: -0.5px;
+}
+
+h1 {
+  @apply text-5xl md:text-6xl lg:text-7xl leading-tight;
+  font-weight: 700;
+}
+
+h2 {
+  @apply text-4xl md:text-5xl leading-tight;
+  font-weight: 700;
+}
+
+h3 {
+  @apply text-2xl md:text-3xl;
+  font-weight: 600;
+}
+
+h4 {
+  @apply text-lg md:text-xl;
+  font-weight: 600;
+}
+
+/* Links */
+a {
+  @apply transition-colors duration-200;
+}
+
+/* Professional code blocks */
+pre {
+  @apply bg-gray-900 border border-gray-800 rounded-lg p-4 overflow-x-auto shadow-lg;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+code {
+  @apply text-gray-100;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875rem;
+}
+
+/* Terminal code blocks */
+.terminal-code {
+  @apply text-green-400;
+}
+
+/* Smooth animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    background-position: -1000px 0;
+  }
+  50% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out;
+}
+
+/* Card hover effects */
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-xl hover:border-accent-green hover:border-opacity-50;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.95) 100%);
+}
+
+/* Copy button styling */
+.copy-button {
+  @apply absolute top-3 right-3 px-3 py-1 bg-gray-700 text-gray-200 rounded text-xs font-semibold hover:bg-accent-green hover:text-white transition-colors duration-200;
+}
+
+/* Section backgrounds */
+section {
+  position: relative;
+}
+
+/* Accent divider */
+.accent-divider {
+  @apply h-1 w-12 bg-gradient-to-r from-accent-green to-accent-green-dark rounded;
+}
