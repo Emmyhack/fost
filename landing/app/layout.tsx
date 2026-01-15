@@ -2,11 +2,11 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Fost - AI-Powered SDK Generation',
+  title: 'FOST - Best-in-Class Web3 SDK Generation',
   description:
-    'Generate production-ready SDKs for Web2 & Web3 in minutes using our intelligent CLI.',
+    'Generate production-ready SDKs for smart contracts across multiple chains. TypeScript, Python, Go, Rust & more.',
   keywords:
-    'SDK, generator, Web3, Web2, AI, CLI, TypeScript, automation, Fost',
+    'Web3, SDK, smart contracts, Ethereum, Polygon, Arbitrum, generator, TypeScript, Python, Go',
   authors: [{ name: 'Fost Team' }],
 };
 

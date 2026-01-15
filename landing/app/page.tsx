@@ -1,7 +1,6 @@
 /**
  * Landing Page
- * Main page that orchestrates all sections for the educational landing site
- * Simple, linear flow that keeps visitors engaged and informed
+ * Main page for FOST - Web3 SDK Generation Platform
  */
 
 import Hero from './components/Hero';
@@ -10,10 +9,13 @@ import Features from './components/Features';
 import CodeExamples from './components/CodeExamples';
 import AIExplainer from './components/AIExplainer';
 import Footer from './components/Footer';
+import { Navbar } from './components/navbar';
 
 export default function Home() {
   return (
-    <main className="overflow-hidden bg-gradient-to-b from-white via-gray-50 to-gray-100">
+    <>
+      <Navbar />
+      <main className="overflow-hidden bg-gradient-to-b from-white via-gray-50 to-gray-100">
       {/* Hero Section */}
       <Hero />
 
@@ -56,6 +58,7 @@ export default function Home() {
 
       {/* CTA & Footer */}
       <Footer />
-    </main>
+      </main>
+    </>
   );
 }

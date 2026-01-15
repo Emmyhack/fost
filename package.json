@@ -20,7 +20,11 @@
     "test": "jest",
     "lint": "eslint src",
     "cli": "node dist/cli/index.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "batch:generate": "ts-node scripts/batch-generate.ts",
+    "publish:sdk": "ts-node scripts/publish-sdk.ts",
+    "ci:local": "npm run build && npm run batch:generate -- --specs-dir ./api-specs --output ./generated-sdks --languages typescript,python",
+    "ci:validate": "npm run lint && npm run test && npm run batch:generate -- --no-validate"
   },
   "keywords": [
     "sdk",

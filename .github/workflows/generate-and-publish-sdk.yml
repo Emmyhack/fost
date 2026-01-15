@@ -1,0 +1,350 @@
+name: Generate and Publish SDK
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'api-specs/**'
+      - 'package.json'
+      - '.github/workflows/generate-and-publish-sdk.yml'
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'api-specs/**'
+  workflow_dispatch:
+    inputs:
+      sdk_name:
+        description: 'SDK name (optional, auto-detected if empty)'
+        required: false
+      publish:
+        description: 'Publish to package manager'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: read
+  packages: write
+  pull-requests: write
+
+jobs:
+  detect-changes:
+    name: Detect API Spec Changes
+    runs-on: ubuntu-latest
+    outputs:
+      specs: ${{ steps.detect.outputs.specs }}
+      has_changes: ${{ steps.detect.outputs.has_changes }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed API specs
+        id: detect
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            # Manual trigger - process specified SDK or all
+            if [ -n "${{ inputs.sdk_name }}" ]; then
+              echo "specs=${{ inputs.sdk_name }}" >> $GITHUB_OUTPUT
+            else
+              specs=$(ls api-specs/*.json api-specs/*.yaml 2>/dev/null | xargs -I {} basename {} | jq -R -s -c 'split("\n")[:-1]')
+              echo "specs=$specs" >> $GITHUB_OUTPUT
+            fi
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            # Detect changes from git
+            base_ref="${{ github.base_ref }}"
+            if [ -z "$base_ref" ]; then
+              base_ref="origin/main"
+            fi
+            
+            changed_files=$(git diff --name-only $base_ref...HEAD 2>/dev/null || git diff --name-only HEAD~1 2>/dev/null || echo "")
+            
+            specs=$(echo "$changed_files" | grep -E "api-specs/.*\.(json|yaml)" | xargs -I {} basename {} | sort -u | jq -R -s -c 'split("\n")[:-1]' || echo "[]")
+            
+            if [ "$specs" != "[]" ] && [ -n "$specs" ]; then
+              echo "has_changes=true" >> $GITHUB_OUTPUT
+            else
+              echo "has_changes=false" >> $GITHUB_OUTPUT
+            fi
+            echo "specs=$specs" >> $GITHUB_OUTPUT
+          fi
+
+  generate-sdk:
+    name: Generate SDK - ${{ matrix.spec }}
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
+    strategy:
+      matrix:
+        spec: ${{ fromJson(needs.detect-changes.outputs.specs) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build FOST
+        run: npm run build
+
+      - name: Extract spec metadata
+        id: metadata
+        run: |
+          spec_file="api-specs/${{ matrix.spec }}"
+          sdk_name=$(basename "$spec_file" | sed 's/\.[^.]*$//')
+          
+          # Extract API type (web2, web3, graphql)
+          if grep -q "\"ethereum\"" "$spec_file" || grep -q "\"solidity\"" "$spec_file"; then
+            api_type="web3"
+          elif grep -q "\"query\"" "$spec_file"; then
+            api_type="graphql"
+          else
+            api_type="web2"
+          fi
+          
+          echo "sdk_name=$sdk_name" >> $GITHUB_OUTPUT
+          echo "api_type=$api_type" >> $GITHUB_OUTPUT
+          echo "spec_file=$spec_file" >> $GITHUB_OUTPUT
+
+      - name: Determine output directory
+        id: output
+        run: |
+          base_dir="generated-sdks/${{ steps.metadata.outputs.sdk_name }}"
+          echo "base_dir=$base_dir" >> $GITHUB_OUTPUT
+          echo "typescript_dir=$base_dir/typescript" >> $GITHUB_OUTPUT
+          echo "python_dir=$base_dir/python" >> $GITHUB_OUTPUT
+
+      - name: Generate TypeScript SDK
+        run: |
+          mkdir -p "${{ steps.output.outputs.typescript_dir }}"
+          npm run cli -- generate \
+            --input "${{ steps.metadata.outputs.spec_file }}" \
+            --language typescript \
+            --type ${{ steps.metadata.outputs.api_type }} \
+            --output "${{ steps.output.outputs.typescript_dir }}" \
+            --docs \
+            --examples \
+            --validate
+
+      - name: Generate Python SDK
+        run: |
+          mkdir -p "${{ steps.output.outputs.python_dir }}"
+          npm run cli -- generate \
+            --input "${{ steps.metadata.outputs.spec_file }}" \
+            --language python \
+            --type ${{ steps.metadata.outputs.api_type }} \
+            --output "${{ steps.output.outputs.python_dir }}" \
+            --docs \
+            --examples \
+            --validate
+
+      - name: Generate Go SDK
+        run: |
+          base_dir="generated-sdks/${{ steps.metadata.outputs.sdk_name }}"
+          mkdir -p "$base_dir/go"
+          npm run cli -- generate \
+            --input "${{ steps.metadata.outputs.spec_file }}" \
+            --language go \
+            --type ${{ steps.metadata.outputs.api_type }} \
+            --output "$base_dir/go" \
+            --docs \
+            --examples \
+            --validate
+
+      - name: Validate generated code
+        run: |
+          echo "Validating generated SDKs..."
+          # TypeScript
+          cd "${{ steps.output.outputs.typescript_dir }}" && npm install --prefer-offline 2>/dev/null && npm run build 2>/dev/null && cd - || true
+          # Python
+          cd "${{ steps.output.outputs.python_dir }}" && python -m py_compile *.py 2>/dev/null || true
+
+      - name: Upload generated SDKs
+        uses: actions/upload-artifact@v3
+        with:
+          name: generated-sdk-${{ steps.metadata.outputs.sdk_name }}
+          path: generated-sdks/${{ steps.metadata.outputs.sdk_name }}
+          retention-days: 30
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const spec = "${{ matrix.spec }}";
+            const sdkName = "${{ steps.metadata.outputs.sdk_name }}";
+            const comment = `✅ **SDK Generated for \`${spec}\`**
+
+            Generated SDK: \`${sdkName}\`
+            API Type: \`${{ steps.metadata.outputs.api_type }}\`
+
+            **Generated Artifacts:**
+            - TypeScript: \`generated-sdks/${sdkName}/typescript\`
+            - Python: \`generated-sdks/${sdkName}/python\`
+            - Go: \`generated-sdks/${sdkName}/go\`
+
+            Download artifacts from the workflow run to review the generated code.`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  publish-to-npm:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    needs: generate-sdk
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.publish == 'true')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: generated-sdks
+
+      - name: Publish TypeScript SDKs
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          for sdk_dir in generated-sdks/generated-sdk-*/typescript; do
+            if [ -d "$sdk_dir" ] && [ -f "$sdk_dir/package.json" ]; then
+              echo "Publishing $(basename $(dirname $(dirname $sdk_dir)))..."
+              cd "$sdk_dir"
+              npm ci
+              npm publish --access public || echo "Package already published or error occurred"
+              cd -
+            fi
+          done
+
+  publish-to-pypi:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    needs: generate-sdk
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.publish == 'true')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: generated-sdks
+
+      - name: Install Python dependencies
+        run: pip install build twine
+
+      - name: Publish Python SDKs
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          for sdk_dir in generated-sdks/generated-sdk-*/python; do
+            if [ -d "$sdk_dir" ] && [ -f "$sdk_dir/setup.py" ]; then
+              echo "Publishing $(basename $(dirname $(dirname $sdk_dir)))..."
+              cd "$sdk_dir"
+              python -m build
+              twine upload dist/* --skip-existing
+              cd -
+            fi
+          done
+
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: [generate-sdk, publish-to-npm, publish-to-pypi]
+    if: |
+      github.event_name == 'push' && 
+      github.ref == 'refs/heads/main' &&
+      always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: generated-sdks
+
+      - name: Generate release notes
+        id: release
+        run: |
+          timestamp=$(date -u +'%Y-%m-%d %H:%M:%S UTC')
+          release_body="## SDK Generation Report
+
+          **Generated:** $timestamp
+          **Commit:** ${{ github.sha }}
+
+          ### Generated SDKs
+          "
+
+          for artifact_dir in generated-sdks/generated-sdk-*; do
+            sdk_name=$(basename "$artifact_dir" | sed 's/^generated-sdk-//')
+            release_body+="- **$sdk_name**: TypeScript, Python, Go"$'\n'
+          done
+
+          echo "release_body<<EOF" >> $GITHUB_OUTPUT
+          echo "$release_body" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: sdk-${{ github.run_number }}
+          release_name: SDK Release #${{ github.run_number }}
+          body: ${{ steps.release.outputs.release_body }}
+          draft: false
+          prerelease: false
+
+  notification:
+    name: Send Notification
+    runs-on: ubuntu-latest
+    needs: [detect-changes, generate-sdk]
+    if: always()
+    steps:
+      - name: Notify Slack (optional)
+        if: secrets.SLACK_WEBHOOK_URL
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "FOST SDK Generation",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*FOST SDK Generation*\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref }}\nStatus: ${{ job.status }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

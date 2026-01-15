@@ -1,0 +1,112 @@
+'use client';
+
+import { useAuth } from '../auth/auth-context';
+import { DashboardHeader } from '../components/dashboard-header';
+import { SDKGeneratorForm } from '../components/sdk-generator-form';
+import { redirect } from 'next/navigation';
+
+export default function DashboardPage() {
+  const { user, isLoading, isAuthenticated } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center font-mono">
+          <div className="mb-4 text-2xl font-bold">FOST</div>
+          <div>Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    redirect('/platform/auth/login');
+  }
+
+  return (
+    <>
+      <DashboardHeader />
+      
+      <main className="min-h-screen bg-gradient-to-br from-white to-gray-50">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          {/* Welcome Section */}
+          <div className="mb-12">
+            <h1 className="text-4xl font-bold font-mono mb-2">
+              Welcome, <span className="text-accent-green">{user?.name}</span>
+            </h1>
+            <p className="text-gray-600 font-mono">
+              Best-in-class Web3 SDK generation for smart contracts, APIs, and beyond.
+            </p>
+          </div>
+
+          {/* Stats */}
+          <div className="mb-12 grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="rounded-lg border border-gray-200 bg-white p-6">
+              <div className="text-sm font-mono text-gray-600">SDKs Generated</div>
+              <div className="mt-2 text-3xl font-bold font-mono">0</div>
+            </div>
+            <div className="rounded-lg border border-gray-200 bg-white p-6">
+              <div className="text-sm font-mono text-gray-600">API Specs Processed</div>
+              <div className="mt-2 text-3xl font-bold font-mono">0</div>
+            </div>
+            <div className="rounded-lg border border-gray-200 bg-white p-6">
+              <div className="text-sm font-mono text-gray-600">Web3 Chains Supported</div>
+              <div className="mt-2 text-3xl font-bold font-mono text-accent-green">5+</div>
+            </div>
+          </div>
+
+          {/* Main Generator */}
+          <div className="grid gap-8 lg:grid-cols-3">
+            <div className="lg:col-span-2">
+              <SDKGeneratorForm />
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Features */}
+              <div className="rounded-lg border border-gray-200 bg-white p-6">
+                <h3 className="mb-4 font-mono font-bold">Web3 Features</h3>
+                <ul className="space-y-3 text-sm font-mono">
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent-green">✓</span>
+                    <span>Smart Contract ABIs</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent-green">✓</span>
+                    <span>Multi-chain Support</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent-green">✓</span>
+                    <span>Wallet Integration</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent-green">✓</span>
+                    <span>Gas Estimation</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent-green">✓</span>
+                    <span>Event Subscriptions</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Quick Start */}
+              <div className="rounded-lg border border-accent-green bg-green-50 p-6">
+                <h3 className="mb-4 font-mono font-bold text-accent-green">Quick Start</h3>
+                <p className="mb-4 text-xs font-mono text-gray-700">
+                  1. Upload your OpenAPI spec or smart contract ABI
+                </p>
+                <p className="mb-4 text-xs font-mono text-gray-700">
+                  2. Select target languages
+                </p>
+                <p className="text-xs font-mono text-gray-700">
+                  3. Generate and download your SDK
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </>
+  );
+}

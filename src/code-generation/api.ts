@@ -60,6 +60,3 @@ export {
 
 // Main generator
 export { SDKCodeGenerator, GenerationResult, GeneratedFile } from "./index";
-
-// Examples
-export { generateStripeSDK, STRIPE_SDK_DESIGN_PLAN, GENERATED_SDK_USAGE_EXAMPLE } from "./examples";

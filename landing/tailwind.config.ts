@@ -15,7 +15,8 @@ const config: Config = {
         'accent-green-dark': '#059669',
       },
       fontFamily: {
-        sans: ['system-ui', 'sans-serif'],
+        sans: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', '"Courier New"', 'monospace'],
       },
       animation: {
         'fade-in': 'fadeIn 0.6s ease-in-out',
