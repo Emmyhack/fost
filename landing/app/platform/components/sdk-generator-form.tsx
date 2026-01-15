@@ -7,7 +7,7 @@ import { useWeb3 } from '../auth/web3-context';
 import { useToast } from '../auth/toast-context';
 import { LoadingSpinner } from './loading-spinner';
 
-export function SDKGeneratorForm() {
+export function SDKGeneratorForm({ onSuccess }: { onSuccess?: () => void }) {
   const { address, chainId } = useWeb3();
   const { addToast } = useToast();
   const [projectName, setProjectName] = useState('');
@@ -130,6 +130,7 @@ export function SDKGeneratorForm() {
           selectedLanguages
         );
         addToast('Web3 SDK generation started!', 'success');
+        onSuccess?.();
       } else if (uploadedFile) {
         // Regular API SDK generation
         const fileContent = await uploadedFile.text();
@@ -143,6 +144,11 @@ export function SDKGeneratorForm() {
           createdAt: new Date(),
         });
         addToast('REST API SDK generation started!', 'success');
+        onSuccess?.();
+        // Reset form
+        setProjectName('');
+        setUploadedFile(null);
+        setSelectedLanguages(['typescript']);
       }
     } catch (error) {
       addToast(`Error generating SDK: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');

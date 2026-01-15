@@ -4,9 +4,42 @@ import { useAuth } from '../auth/auth-context';
 import { DashboardHeader } from '../components/dashboard-header';
 import { SDKGeneratorForm } from '../components/sdk-generator-form';
 import { redirect } from 'next/navigation';
+import { useEffect, useState } from 'react';
+
+interface UserStats {
+  sdksGenerated: number;
+  specsProcessed: number;
+  chainsSupported: number;
+}
 
 export default function DashboardPage() {
   const { user, isLoading, isAuthenticated } = useAuth();
+  const [stats, setStats] = useState<UserStats>({ sdksGenerated: 0, specsProcessed: 0, chainsSupported: 5 });
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      fetchUserStats();
+    }
+  }, [isAuthenticated, user?.id]);
+
+  const fetchUserStats = async () => {
+    try {
+      const response = await fetch(`/api/user/stats?userId=${user?.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setStats({
+          sdksGenerated: data.sdksGenerated || 0,
+          specsProcessed: data.specsProcessed || 0,
+          chainsSupported: 5,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch stats:', error);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -32,7 +65,7 @@ export default function DashboardPage() {
           {/* Welcome Section */}
           <div className="mb-12">
             <h1 className="text-4xl font-bold font-mono mb-2">
-              Welcome, <span className="text-accent-green">{user?.name}</span>
+              Welcome, <span className="text-accent-green">{user?.name || 'User'}</span>
             </h1>
             <p className="text-gray-600 font-mono">
               Best-in-class Web3 SDK generation for smart contracts, APIs, and beyond.
@@ -43,22 +76,22 @@ export default function DashboardPage() {
           <div className="mb-12 grid grid-cols-1 gap-4 md:grid-cols-3">
             <div className="rounded-lg border border-gray-200 bg-white p-6">
               <div className="text-sm font-mono text-gray-600">SDKs Generated</div>
-              <div className="mt-2 text-3xl font-bold font-mono">0</div>
+              <div className="mt-2 text-3xl font-bold font-mono">{stats.sdksGenerated}</div>
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-6">
               <div className="text-sm font-mono text-gray-600">API Specs Processed</div>
-              <div className="mt-2 text-3xl font-bold font-mono">0</div>
+              <div className="mt-2 text-3xl font-bold font-mono">{stats.specsProcessed}</div>
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-6">
               <div className="text-sm font-mono text-gray-600">Web3 Chains Supported</div>
-              <div className="mt-2 text-3xl font-bold font-mono text-accent-green">5+</div>
+              <div className="mt-2 text-3xl font-bold font-mono text-accent-green">{stats.chainsSupported}</div>
             </div>
           </div>
 
           {/* Main Generator */}
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
-              <SDKGeneratorForm />
+              <SDKGeneratorForm onSuccess={fetchUserStats} />
             </div>
 
             {/* Sidebar */}
