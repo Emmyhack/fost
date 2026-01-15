@@ -23,7 +23,7 @@ export default function DocsPage() {
 
           <div className="space-y-4 text-sm">
             <div>
-              <h2 className="font-semibold text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 1. Create an Account
               </h2>
               <p className="text-gray-700">
@@ -33,7 +33,7 @@ export default function DocsPage() {
             </div>
 
             <div>
-              <h2 className="font-semibold text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 2. Upload Your Spec
               </h2>
               <p className="text-gray-700">
@@ -43,7 +43,7 @@ export default function DocsPage() {
             </div>
 
             <div>
-              <h2 className="font-semibold text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 3. Select Languages
               </h2>
               <p className="text-gray-700">
@@ -53,7 +53,7 @@ export default function DocsPage() {
             </div>
 
             <div>
-              <h2 className="font-semibold text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 4. Generate & Download
               </h2>
               <p className="text-gray-700">
