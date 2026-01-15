@@ -2,6 +2,7 @@
 
 import { AuthProvider } from './auth/auth-context';
 import { ToastProvider } from './auth/toast-context';
+import { Web3Provider } from './auth/web3-context';
 import { ToastContainer } from './components/toast-container';
 
 export default function PlatformLayout({
@@ -12,8 +13,10 @@ export default function PlatformLayout({
   return (
     <ToastProvider>
       <AuthProvider>
-        <ToastContainer />
-        {children}
+        <Web3Provider>
+          <ToastContainer />
+          {children}
+        </Web3Provider>
       </AuthProvider>
     </ToastProvider>
   );
