@@ -35,10 +35,20 @@ export function loadUsers(): Map<string, StoredUser> {
     
     if (fs.existsSync(USERS_FILE)) {
       const data = fs.readFileSync(USERS_FILE, 'utf-8');
-      const usersList: StoredUser[] = JSON.parse(data);
-      usersList.forEach(user => {
-        users.set(user.id, user);
-      });
+      if (data && data.trim()) {
+        try {
+          const usersList: StoredUser[] = JSON.parse(data);
+          if (Array.isArray(usersList)) {
+            usersList.forEach(user => {
+              if (user && user.id && user.email) {
+                users.set(user.id, user);
+              }
+            });
+          }
+        } catch (parseError) {
+          console.error('Failed to parse users.json:', parseError);
+        }
+      }
     }
   } catch (error) {
     console.error('Failed to load users:', error);

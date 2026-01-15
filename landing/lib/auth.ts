@@ -13,11 +13,12 @@ import {
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const SALT_ROUNDS = 10;
 
-// In-memory cache for current session
-let usersCache: Map<string, any> | null = null;
+// In-memory cache for current session - load on startup
+let usersCache: Map<string, any> = loadUsers();
 
 function getUsersCache(): Map<string, any> {
-  if (!usersCache) {
+  // Ensure cache is initialized
+  if (!usersCache || usersCache.size === 0) {
     usersCache = loadUsers();
   }
   return usersCache;
