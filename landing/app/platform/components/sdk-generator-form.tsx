@@ -19,6 +19,7 @@ export function SDKGeneratorForm({ onSuccess }: { onSuccess?: () => void }) {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [fileError, setFileError] = useState('');
+  const [abiInput, setAbiInput] = useState(''); // For pasting ABI
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const languages = [
@@ -116,6 +117,11 @@ export function SDKGeneratorForm({ onSuccess }: { onSuccess?: () => void }) {
       return;
     }
 
+    if (isWeb3 && !abiInput.trim()) {
+      addToast('Please provide a contract ABI', 'warning');
+      return;
+    }
+
     setIsGenerating(true);
     try {
       if (isWeb3 && contractAddress) {
@@ -125,12 +131,17 @@ export function SDKGeneratorForm({ onSuccess }: { onSuccess?: () => void }) {
             chainId: parseInt(selectedChainId),
             contractAddress,
             contractName: projectName,
-            abiJson: '{}', // Will be fetched from Etherscan in next task
+            abiJson: abiInput,
           },
           selectedLanguages
         );
         addToast('Web3 SDK generation started!', 'success');
         onSuccess?.();
+        // Reset form
+        setProjectName('');
+        setContractAddress('');
+        setAbiInput('');
+        setSelectedLanguages(['typescript']);
       } else if (uploadedFile) {
         // Regular API SDK generation
         const fileContent = await uploadedFile.text();
@@ -286,6 +297,21 @@ export function SDKGeneratorForm({ onSuccess }: { onSuccess?: () => void }) {
               placeholder="0x..."
               className="mt-2 w-full rounded border border-gray-300 px-4 py-2 font-mono text-sm focus:border-accent-green focus:outline-none"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-mono font-semibold text-gray-700 mb-2">
+              Contract ABI (JSON)
+            </label>
+            <textarea
+              value={abiInput}
+              onChange={(e) => setAbiInput(e.target.value)}
+              placeholder='Paste your contract ABI here, e.g., [{"type":"function","name":"transfer",...}]'
+              className="w-full rounded border border-gray-300 px-4 py-2 font-mono text-xs focus:border-accent-green focus:outline-none h-32 resize-none"
+            />
+            <p className="mt-2 text-xs text-gray-600 font-mono">
+              Paste the complete contract ABI in JSON format
+            </p>
           </div>
 
           {address && (
