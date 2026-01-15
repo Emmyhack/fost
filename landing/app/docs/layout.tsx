@@ -104,24 +104,10 @@ export default function DocsLayout({
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Top Navigation */}
-      <div className="border-b border-gray-200 bg-white px-6 py-4 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-4 text-sm font-mono">
-            <Link href="/" className="text-accent-green hover:underline font-bold">
-              FOST
-            </Link>
-            <span className="text-gray-400">/</span>
-            <span className="text-gray-600">Documentation</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 border-r border-gray-200 bg-gray-50 min-h-screen">
-          <div className="sticky top-20 p-6 space-y-6 max-h-[calc(100vh-80px)] overflow-y-auto">
+    <div className="min-h-screen bg-white flex">
+      {/* Sidebar */}
+      <div className="w-64 border-r border-gray-200 bg-gray-50 min-h-screen">
+        <div className="sticky top-0 p-6 space-y-6 max-h-screen overflow-y-auto">
             {docSections.map((section) => (
               <div key={section.id}>
                 <button
@@ -170,13 +156,12 @@ export default function DocsLayout({
                 )}
               </div>
             ))}
-          </div>
         </div>
+      </div>
 
-        {/* Main Content */}
-        <div className="flex-1">
-          {children}
-        </div>
+      {/* Main Content */}
+      <div className="flex-1">
+        {children}
       </div>
     </div>
   );
