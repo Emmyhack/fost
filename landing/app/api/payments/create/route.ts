@@ -4,6 +4,7 @@ import { createPaymentSession } from '@/lib/paycrest';
 
 interface CreatePaymentRequest {
   plan: 'pro' | 'enterprise';
+  paymentMethod?: 'card' | 'mobile_money' | 'paj_cash';
 }
 
 const PLAN_PRICES: Record<string, { amount: number; currency: string; credits: number }> = {
@@ -31,11 +32,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body: CreatePaymentRequest = await request.json();
-    const { plan } = body;
+    const { plan, paymentMethod = 'card' } = body;
 
     if (!plan || !PLAN_PRICES[plan]) {
       return NextResponse.json(
         { error: 'Invalid plan' },
+        { status: 400 }
+      );
+    }
+
+    if (!['card', 'mobile_money', 'paj_cash'].includes(paymentMethod)) {
+      return NextResponse.json(
+        { error: 'Invalid payment method' },
         { status: 400 }
       );
     }
@@ -48,10 +56,12 @@ export async function POST(request: NextRequest) {
       email: auth.user.email,
       userId: auth.user.id,
       plan,
+      paymentMethod,
       description: `FOST ${plan.toUpperCase()} Plan - ${planDetails.credits} credits`,
       metadata: {
         planName: plan,
         creditsAmount: planDetails.credits,
+        paymentMethod,
       },
     });
 

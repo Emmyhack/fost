@@ -17,6 +17,7 @@ export interface PaymentRequest {
   userId: string;
   plan: 'pro' | 'enterprise';
   description: string;
+  paymentMethod?: 'card' | 'mobile_money' | 'paj_cash';
   metadata?: Record<string, any>;
 }
 
@@ -69,9 +70,11 @@ export async function createPaymentSession(
     reference: `${request.userId}-${Date.now()}`,
     callback_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/payments/webhook`,
     redirect_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/platform/dashboard?payment=success`,
+    payment_method: request.paymentMethod || 'card',
     metadata: {
       userId: request.userId,
       plan: request.plan,
+      paymentMethod: request.paymentMethod || 'card',
       ...request.metadata,
     },
   };

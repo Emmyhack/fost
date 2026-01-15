@@ -54,6 +54,7 @@ export default function PricingModal({
 }: PricingModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<'card' | 'mobile_money' | 'paj_cash'>('card');
 
   const handleUpgrade = async (planName: string) => {
     try {
@@ -65,7 +66,10 @@ export default function PricingModal({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ plan: planName.toLowerCase() }),
+        body: JSON.stringify({ 
+          plan: planName.toLowerCase(),
+          paymentMethod: selectedMethod 
+        }),
       });
 
       if (!response.ok) {
@@ -117,6 +121,59 @@ export default function PricingModal({
               <p className="text-red-700 text-sm">{error}</p>
             </div>
           )}
+
+          {/* Payment Method Selection */}
+          <div className="mb-8 p-4 border border-gray-200 rounded-lg bg-gray-50">
+            <label className="block text-sm font-semibold text-gray-700 mb-4">
+              Payment Method
+            </label>
+            <div className="space-y-3">
+              <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-white transition-colors" style={{backgroundColor: selectedMethod === 'card' ? '#f0fdf4' : 'transparent', borderColor: selectedMethod === 'card' ? '#22c55e' : undefined}}>
+                <input
+                  type="radio"
+                  name="payment-method"
+                  value="card"
+                  checked={selectedMethod === 'card'}
+                  onChange={(e) => setSelectedMethod(e.target.value as any)}
+                  className="w-4 h-4"
+                />
+                <span className="ml-3">
+                  <span className="block font-semibold text-gray-900">Credit/Debit Card</span>
+                  <span className="text-xs text-gray-600">Visa, Mastercard, etc.</span>
+                </span>
+              </label>
+              
+              <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-white transition-colors" style={{backgroundColor: selectedMethod === 'mobile_money' ? '#f0fdf4' : 'transparent', borderColor: selectedMethod === 'mobile_money' ? '#22c55e' : undefined}}>
+                <input
+                  type="radio"
+                  name="payment-method"
+                  value="mobile_money"
+                  checked={selectedMethod === 'mobile_money'}
+                  onChange={(e) => setSelectedMethod(e.target.value as any)}
+                  className="w-4 h-4"
+                />
+                <span className="ml-3">
+                  <span className="block font-semibold text-gray-900">Mobile Money</span>
+                  <span className="text-xs text-gray-600">Airtel, MTN, Vodafone, etc.</span>
+                </span>
+              </label>
+
+              <label className="flex items-center p-3 border border-green-300 rounded-lg cursor-pointer hover:bg-white transition-colors" style={{backgroundColor: selectedMethod === 'paj_cash' ? '#f0fdf4' : 'transparent', borderColor: selectedMethod === 'paj_cash' ? '#22c55e' : '#d1d5db'}}>
+                <input
+                  type="radio"
+                  name="payment-method"
+                  value="paj_cash"
+                  checked={selectedMethod === 'paj_cash'}
+                  onChange={(e) => setSelectedMethod(e.target.value as any)}
+                  className="w-4 h-4"
+                />
+                <span className="ml-3">
+                  <span className="block font-semibold text-gray-900">Paj Cash</span>
+                  <span className="text-xs text-gray-600">Fast, secure digital wallet</span>
+                </span>
+              </label>
+            </div>
+          </div>
 
           {/* Plans Grid */}
           <div className="grid md:grid-cols-2 gap-6 mb-8">
