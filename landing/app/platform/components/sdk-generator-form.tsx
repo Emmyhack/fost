@@ -6,6 +6,7 @@ import { WalletConnect } from './wallet-connect';
 import { useWeb3 } from '../auth/web3-context';
 import { useToast } from '../auth/toast-context';
 import { LoadingSpinner } from './loading-spinner';
+import { SDKGenerationSuccess } from './sdk-generation-success';
 
 export function SDKGeneratorForm({ onSuccess }: { onSuccess?: () => void }) {
   const { address, chainId } = useWeb3();
@@ -20,6 +21,8 @@ export function SDKGeneratorForm({ onSuccess }: { onSuccess?: () => void }) {
   const [isDragging, setIsDragging] = useState(false);
   const [fileError, setFileError] = useState('');
   const [abiInput, setAbiInput] = useState(''); // For pasting ABI
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [successData, setSuccessData] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const languages = [
@@ -126,7 +129,7 @@ export function SDKGeneratorForm({ onSuccess }: { onSuccess?: () => void }) {
     try {
       if (isWeb3 && contractAddress) {
         // Web3 SDK generation
-        await generateWeb3SDK(
+        const result = await generateWeb3SDK(
           {
             chainId: parseInt(selectedChainId),
             contractAddress,
@@ -135,8 +138,19 @@ export function SDKGeneratorForm({ onSuccess }: { onSuccess?: () => void }) {
           },
           selectedLanguages
         );
-        addToast('Web3 SDK generation started!', 'success');
+        
+        // Show success modal
+        setSuccessData({
+          sdkId: result,
+          projectName,
+          languages: selectedLanguages,
+          downloadUrl: `/api/sdk/download?sdkId=${result}`,
+          isWeb3: true,
+        });
+        setSuccessModalOpen(true);
+        addToast('Web3 SDK generated successfully!', 'success');
         onSuccess?.();
+        
         // Reset form
         setProjectName('');
         setContractAddress('');
@@ -145,7 +159,7 @@ export function SDKGeneratorForm({ onSuccess }: { onSuccess?: () => void }) {
       } else if (uploadedFile) {
         // Regular API SDK generation
         const fileContent = await uploadedFile.text();
-        await generateSDK({
+        const result = await generateSDK({
           id: 'gen_' + Date.now(),
           userId: 'current_user',
           projectName,
@@ -154,8 +168,19 @@ export function SDKGeneratorForm({ onSuccess }: { onSuccess?: () => void }) {
           status: 'processing',
           createdAt: new Date(),
         });
-        addToast('REST API SDK generation started!', 'success');
+        
+        // Show success modal
+        setSuccessData({
+          sdkId: result,
+          projectName,
+          languages: selectedLanguages,
+          downloadUrl: `/api/sdk/download?sdkId=${result}`,
+          isWeb3: false,
+        });
+        setSuccessModalOpen(true);
+        addToast('REST API SDK generated successfully!', 'success');
         onSuccess?.();
+        
         // Reset form
         setProjectName('');
         setUploadedFile(null);
@@ -171,6 +196,18 @@ export function SDKGeneratorForm({ onSuccess }: { onSuccess?: () => void }) {
   return (
     <div className="rounded-lg border border-gray-200 bg-white p-6">
       <h2 className="mb-6 text-xl font-bold font-mono">Generate SDK</h2>
+
+      {/* Success Modal */}
+      <SDKGenerationSuccess
+        isOpen={successModalOpen}
+        onClose={() => setSuccessModalOpen(false)}
+        sdkId={successData?.sdkId || ''}
+        projectName={successData?.projectName || ''}
+        languages={successData?.languages || []}
+        creditsRemaining={0}
+        downloadUrl={successData?.downloadUrl || ''}
+        isWeb3={successData?.isWeb3 || false}
+      />
 
       {/* Project Name */}
       <div className="mb-6">

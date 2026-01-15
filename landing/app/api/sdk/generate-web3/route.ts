@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticateRequest } from '@/lib/auth';
 import { storeSDK } from '@/lib/sdk-storage';
+import { updateUserData, getUserById } from '@/lib/user-storage';
 
 interface Web3GenerateRequest {
   chainId: number;
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
   try {
     // Authenticate request
     const auth = await authenticateRequest(request);
-    if (!auth) {
+    if (!auth || !auth.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -29,6 +30,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
+      );
+    }
+
+    // Check user credits (1 credit per SDK)
+    const user = getUserById(auth.user.id);
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    const creditsNeeded = 1;
+    if ((user.credits || 0) < creditsNeeded) {
+      return NextResponse.json(
+        { error: 'Insufficient credits. Please upgrade your plan.' },
+        { status: 402 }
       );
     }
 
@@ -87,13 +105,34 @@ export async function POST(request: NextRequest) {
     // Store SDK files
     storeSDK(sdkId, files, contractName);
 
+    // Deduct credits
+    updateUserData(auth.user.id, {
+      credits: user.credits - creditsNeeded,
+    });
+
+    // Track SDK generation
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/user/stats`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'sdk-generated',
+          value: 1,
+        }),
+      });
+    } catch (e) {
+      console.log('Stats tracking failed (non-critical):', e);
+    }
+
     return NextResponse.json({
       id: sdkId,
-      downloadUrl: `/api/sdk/download/${sdkId}`,
+      downloadUrl: `/api/sdk/download?sdkId=${sdkId}`,
       files: Object.keys(files),
       contractName,
       chainId,
       contractAddress,
+      creditsRemaining: user.credits - creditsNeeded,
+      message: 'Web3 SDK generated successfully',
     });
   } catch (error) {
     console.error('Web3 SDK generation error:', error);

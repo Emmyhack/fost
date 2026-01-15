@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticateRequest } from '@/lib/auth';
 import { validateSpecification } from '@/lib/spec-validation';
 import { storeSDK } from '@/lib/sdk-storage';
+import { updateUserData, getUserById } from '@/lib/user-storage';
 
 interface GenerateRequest {
   projectName: string;
@@ -430,11 +431,47 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check user credits (1 credit per SDK)
+    const user = getUserById(auth.user.id);
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    const creditsNeeded = 1;
+    if ((user.credits || 0) < creditsNeeded) {
+      return NextResponse.json(
+        { error: 'Insufficient credits. Please upgrade your plan.' },
+        { status: 402 }
+      );
+    }
+
     // Generate SDK
     const result = await generateSDKFromOpenAPI(apiSpec, projectName, targetLanguages);
 
     // Store SDK files for download
     storeSDK(result.id, result.files, projectName);
+
+    // Deduct credits
+    updateUserData(auth.user.id, {
+      credits: user.credits - creditsNeeded,
+    });
+
+    // Track SDK generation
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/user/stats`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'sdk-generated',
+          value: 1,
+        }),
+      });
+    } catch (e) {
+      console.log('Stats tracking failed (non-critical):', e);
+    }
 
     return NextResponse.json(
       {
@@ -443,6 +480,7 @@ export async function POST(request: NextRequest) {
         languages: targetLanguages,
         fileCount: Object.keys(result.files).length,
         downloadUrl: `/api/sdk/download?sdkId=${result.id}`,
+        creditsRemaining: user.credits - creditsNeeded,
         message: 'SDK generated successfully',
       },
       { status: 200 }
