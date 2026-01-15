@@ -18,14 +18,14 @@ export default function DocsPage() {
         {/* Quick Start */}
         <section className="mb-16 rounded-lg bg-gradient-to-br from-green-50 to-blue-50 p-8 border border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            🚀 Quick Start
+             Quick Start
           </h2>
 
           <div className="space-y-4 text-sm">
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h2 className="font-semibold text-gray-900 mb-2">
                 1. Create an Account
-              </h3>
+              </h2>
               <p className="text-gray-700">
                 Sign up on FOST to get 100 free credits and start generating SDKs
                 immediately.
@@ -33,9 +33,9 @@ export default function DocsPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h2 className="font-semibold text-gray-900 mb-2">
                 2. Upload Your Spec
-              </h3>
+              </h2>
               <p className="text-gray-700">
                 Upload an OpenAPI spec for REST APIs or a contract ABI for Web3
                 smart contracts.
@@ -43,9 +43,9 @@ export default function DocsPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h2 className="font-semibold text-gray-900 mb-2">
                 3. Select Languages
-              </h3>
+              </h2>
               <p className="text-gray-700">
                 Choose from 8 supported languages: TypeScript, Python, Go, Java,
                 C#, Rust, Ruby, PHP.
@@ -53,9 +53,9 @@ export default function DocsPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h2 className="font-semibold text-gray-900 mb-2">
                 4. Generate & Download
-              </h3>
+              </h2>
               <p className="text-gray-700">
                 Get a production-ready SDK with full type safety and
                 comprehensive documentation.
@@ -73,7 +73,7 @@ export default function DocsPage() {
 
         {/* Features */}
         <section className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">✨ Features</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6"> Features</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="rounded-lg border border-gray-200 p-6">
@@ -138,7 +138,7 @@ export default function DocsPage() {
         {/* Supported Languages */}
         <section className="mb-16">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            🧑‍💻 Supported Languages
+             Supported Languages
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
