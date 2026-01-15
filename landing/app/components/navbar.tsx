@@ -21,9 +21,6 @@ export function Navbar() {
             <Link href="/docs" className="font-mono text-sm hover:text-accent-green">
               Docs
             </Link>
-            <Link href="/docs/web3/overview" className="font-mono text-sm hover:text-accent-green">
-              Web3 Docs
-            </Link>
             <Link href="/pricing" className="font-mono text-sm hover:text-accent-green">
               Pricing
             </Link>
@@ -71,9 +68,6 @@ export function Navbar() {
           <div className="md:hidden border-t border-gray-200 py-4 space-y-4">
             <Link href="/docs" className="block font-mono text-sm hover:text-accent-green">
               Docs
-            </Link>
-            <Link href="/docs/web3/overview" className="block font-mono text-sm hover:text-accent-green">
-              Web3 Docs
             </Link>
             <Link href="/pricing" className="block font-mono text-sm hover:text-accent-green">
               Pricing
