@@ -1,13 +1,27 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  loadUsers,
+  saveUsers,
+  addUser,
+  updateUserData,
+  getUserById as getPersistentUserById,
+  getUserByEmail as getPersistentUserByEmail,
+} from './user-storage';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const SALT_ROUNDS = 10;
 
-// Simple in-memory user database (replace with Prisma/DB in production)
-const users: Map<string, any> = new Map();
-const tokens: Set<string> = new Set();
+// In-memory cache for current session
+let usersCache: Map<string, any> | null = null;
+
+function getUsersCache(): Map<string, any> {
+  if (!usersCache) {
+    usersCache = loadUsers();
+  }
+  return usersCache;
+}
 
 export interface TokenPayload {
   userId: string;
@@ -70,7 +84,7 @@ export interface StoredUser {
   passwordHash: string;
   plan: 'free' | 'pro' | 'enterprise';
   credits: number;
-  createdAt: Date;
+  createdAt: string; // ISO string
   organization?: string;
 }
 
@@ -87,31 +101,57 @@ export function createUser(
     passwordHash,
     plan: 'free',
     credits: 100, // Free tier starts with 100 credits
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   };
+  
+  const users = getUsersCache();
   users.set(id, user);
+  addUser(user); // Persist to disk
+  
   return user;
 }
 
 export function getUserById(userId: string): StoredUser | undefined {
-  return users.get(userId);
+  // Try cache first, then fallback to persistent storage
+  const users = getUsersCache();
+  let user = users.get(userId);
+  
+  if (!user) {
+    user = getPersistentUserById(userId);
+    if (user) {
+      users.set(userId, user); // Cache it
+    }
+  }
+  
+  return user;
 }
 
 export function getUserByEmail(email: string): StoredUser | undefined {
+  // Try cache first
+  const users = getUsersCache();
   for (const user of users.values()) {
     if (user.email === email) {
       return user;
     }
   }
-  return undefined;
+  
+  // Fallback to persistent storage
+  const persistentUser = getPersistentUserByEmail(email);
+  if (persistentUser) {
+    users.set(persistentUser.id, persistentUser); // Cache it
+  }
+  
+  return persistentUser;
 }
 
 export function updateUser(userId: string, updates: Partial<StoredUser>): StoredUser | null {
+  const users = getUsersCache();
   const user = users.get(userId);
   if (!user) return null;
 
   const updated = { ...user, ...updates };
   users.set(userId, updated);
+  updateUserData(userId, updates); // Persist to disk
   return updated;
 }
 
