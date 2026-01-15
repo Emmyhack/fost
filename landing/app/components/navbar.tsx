@@ -21,7 +21,7 @@ export function Navbar() {
             <Link href="/docs" className="font-mono text-sm hover:text-accent-green">
               Docs
             </Link>
-            <Link href="/web3-docs" className="font-mono text-sm hover:text-accent-green">
+            <Link href="/docs/web3/overview" className="font-mono text-sm hover:text-accent-green">
               Web3 Docs
             </Link>
             <Link href="/pricing" className="font-mono text-sm hover:text-accent-green">
@@ -72,7 +72,7 @@ export function Navbar() {
             <Link href="/docs" className="block font-mono text-sm hover:text-accent-green">
               Docs
             </Link>
-            <Link href="/web3-docs" className="block font-mono text-sm hover:text-accent-green">
+            <Link href="/docs/web3/overview" className="block font-mono text-sm hover:text-accent-green">
               Web3 Docs
             </Link>
             <Link href="/pricing" className="block font-mono text-sm hover:text-accent-green">
