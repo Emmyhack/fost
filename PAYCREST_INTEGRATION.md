@@ -2,7 +2,7 @@
 
 ## Overview
 
-FOST now includes integrated payment processing via Paycrest, enabling users to upgrade their accounts and purchase credits for SDK generation.
+FOST now includes integrated payment processing via Paycrest, enabling users to upgrade their accounts and purchase credits for SDK generation. The platform supports multiple payment settlement methods including **Credit/Debit Cards**, **Mobile Money**, and **Paj Cash**.
 
 ## Architecture
 
@@ -40,6 +40,30 @@ FOST now includes integrated payment processing via Paycrest, enabling users to 
 - **Credits**: 5,000
 - **Features**: All Pro features + Dedicated support, Custom integrations, Webhook access
 
+## Payment Settlement Methods
+
+FOST supports three payment settlement methods via Paycrest:
+
+### 1. Credit/Debit Card
+- **Visa**, **Mastercard**, **American Express**
+- Instant processing (2-5 minutes)
+- Global availability
+- Request: `paymentMethod: "card"`
+
+### 2. Mobile Money
+- **Airtel Money**, **MTN Mobile Money**, **Vodafone Cash**, and regional providers
+- 5-30 minute processing
+- Optimized for Africa and emerging markets
+- Request: `paymentMethod: "mobile_money"`
+
+### 3. Paj Cash
+- **Fast digital wallet** with instant notifications
+- Instant to 10 minute processing
+- Multi-currency support
+- Low transaction fees
+- Cross-border transfer capability
+- Request: `paymentMethod: "paj_cash"`
+
 ## Payment Flow
 
 ```
@@ -49,21 +73,21 @@ Pricing Modal opens
     ↓
 User selects plan (Pro/Enterprise)
     ↓
-POST /api/payments/create with plan
+User selects payment method (Card/Mobile Money/Paj Cash)
     ↓
-Backend creates Paycrest session
+POST /api/payments/create with plan and paymentMethod
+    ↓
+Backend creates Paycrest session with selected method
     ↓
 User redirected to Paycrest checkout
     ↓
-Payment processed
+Payment processed via selected method
     ↓
 Paycrest sends webhook to /api/payments/webhook
     ↓
 Webhook signature verified
     ↓
 Credits allocated to user account
-    ↓
-Payment recorded in database
 ```
 
 ## Environment Variables Required
@@ -88,9 +112,14 @@ Create a new payment session.
 **Request:**
 ```json
 {
-  "plan": "pro"  // or "enterprise"
+  "plan": "pro",
+  "paymentMethod": "paj_cash"
 }
 ```
+
+Supported values:
+- `plan`: `"pro"` or `"enterprise"`
+- `paymentMethod`: `"card"`, `"mobile_money"`, or `"paj_cash"` (defaults to `"card"`)
 
 **Response:**
 ```json
@@ -103,7 +132,7 @@ Create a new payment session.
 **Error Response:**
 ```json
 {
-  "error": "Invalid plan selected"
+  "error": "Invalid payment method"
 }
 ```
 
