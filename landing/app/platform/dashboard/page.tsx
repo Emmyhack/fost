@@ -3,6 +3,7 @@
 import { useAuth } from '../auth/auth-context';
 import { DashboardHeader } from '../components/dashboard-header';
 import { SDKGeneratorForm } from '../components/sdk-generator-form';
+import PricingModal from '../components/pricing-modal';
 import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -16,6 +17,8 @@ export default function DashboardPage() {
   const { user, isLoading, isAuthenticated } = useAuth();
   const [stats, setStats] = useState<UserStats>({ sdksGenerated: 0, specsProcessed: 0, chainsSupported: 5 });
   const [statsLoading, setStatsLoading] = useState(true);
+  const [isPricingOpen, setIsPricingOpen] = useState(false);
+  const [userCredits, setUserCredits] = useState(0);
 
   useEffect(() => {
     if (isAuthenticated && user?.id) {
@@ -59,6 +62,11 @@ export default function DashboardPage() {
   return (
     <>
       <DashboardHeader />
+      <PricingModal
+        isOpen={isPricingOpen}
+        onClose={() => setIsPricingOpen(false)}
+        currentCredits={userCredits}
+      />
       
       <main className="min-h-screen bg-gradient-to-br from-white to-gray-50">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -85,6 +93,16 @@ export default function DashboardPage() {
             <div className="rounded-lg border border-gray-200 bg-white p-6">
               <div className="text-sm font-mono text-gray-600">Web3 Chains Supported</div>
               <div className="mt-2 text-3xl font-bold font-mono text-accent-green">{stats.chainsSupported}</div>
+            </div>
+            <div className="rounded-lg border border-green-200 bg-green-50 p-6">
+              <div className="text-sm font-mono text-gray-600">Available Credits</div>
+              <div className="mt-2 text-3xl font-bold font-mono text-accent-green">{userCredits}</div>
+              <button
+                onClick={() => setIsPricingOpen(true)}
+                className="mt-4 w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-2 rounded-lg font-semibold text-sm hover:from-green-700 hover:to-green-800 transition-all"
+              >
+                Get More Credits
+              </button>
             </div>
           </div>
 
