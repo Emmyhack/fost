@@ -79,6 +79,10 @@ export default function PricingModal({
 
       const { redirectUrl } = await response.json();
 
+      if (!redirectUrl) {
+        throw new Error('Invalid payment session response');
+      }
+
       // Redirect to Paycrest checkout
       window.location.href = redirectUrl;
     } catch (err) {

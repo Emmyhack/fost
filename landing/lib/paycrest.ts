@@ -58,7 +58,7 @@ export async function createPaymentSession(
   request: PaymentRequest
 ): Promise<PaymentResponse> {
   if (!API_KEY || !BUSINESS_ID) {
-    throw new Error('Paycrest credentials not configured');
+    throw new Error('Paycrest credentials not configured. Please set PAYCREST_API_KEY and PAYCREST_BUSINESS_ID environment variables.');
   }
 
   const payload = {
@@ -90,7 +90,7 @@ export async function createPaymentSession(
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(`Paycrest API error: ${error.message}`);
+    throw new Error(`Paycrest API error: ${error.message || 'Unknown error'}`);
   }
 
   const data = await response.json();

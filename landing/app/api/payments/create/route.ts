@@ -26,24 +26,33 @@ export async function POST(request: NextRequest) {
 
     if (!auth.authenticated || !auth.user) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Unauthorized - please log in first' },
         { status: 401 }
       );
     }
 
-    const body: CreatePaymentRequest = await request.json();
+    let body: CreatePaymentRequest;
+    try {
+      body = await request.json();
+    } catch (e) {
+      return NextResponse.json(
+        { error: 'Invalid request body' },
+        { status: 400 }
+      );
+    }
+
     const { plan, paymentMethod = 'card' } = body;
 
     if (!plan || !PLAN_PRICES[plan]) {
       return NextResponse.json(
-        { error: 'Invalid plan' },
+        { error: `Invalid plan. Supported: ${Object.keys(PLAN_PRICES).join(', ')}` },
         { status: 400 }
       );
     }
 
     if (!['card', 'mobile_money', 'paj_cash'].includes(paymentMethod)) {
       return NextResponse.json(
-        { error: 'Invalid payment method' },
+        { error: 'Invalid payment method. Supported: card, mobile_money, paj_cash' },
         { status: 400 }
       );
     }
@@ -68,8 +77,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(paymentSession);
   } catch (error) {
     console.error('Payment creation error:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Failed to create payment session' },
+      { error: message },
       { status: 500 }
     );
   }
