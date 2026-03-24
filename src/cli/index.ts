@@ -833,3 +833,19 @@ See [fost documentation](https://docs.fost.dev) for more information.
     }
   }
 }
+
+/**
+ * Auto-execute CLI when this file is run directly
+ * This allows the compiled dist/cli/index.js to be used as a bin entry point
+ */
+if (require.main === module) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { bootstrap } = require('./bootstrap');
+  bootstrap({ argv: process.argv.slice(2) })
+    .catch((error: unknown) => {
+      if (error instanceof Error) {
+        console.error('Fatal error:', error.message);
+      }
+      process.exit(1);
+    });
+}

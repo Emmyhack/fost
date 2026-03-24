@@ -4,7 +4,7 @@
 
 **Status**: 🟡 Alpha (v0.1.0)  
 **License**: MIT  
-**Repository**: [github.com/Emmyhack/fost](https://github.com/Emmyhack/fost)  
+**Repository**: [github.com/geekstrancend/fost](https://github.com/geekstrancend/fost)  
 **Live Site**: [fost.vercel.app](https://fost.vercel.app)
 
 ---
@@ -28,6 +28,7 @@ FOST generates production-ready, fully-typed SDKs from API specifications:
 - **Solana IDL** (planned)
 
 Output in:
+
 - **TypeScript** ✅ (production-ready)
 - **Python, Go, Rust** (planned)
 
@@ -113,7 +114,7 @@ This is the Next.js landing page and platform for FOST.
 
 ```bash
 # Clone repository
-git clone https://github.com/Emmyhack/fost.git
+git clone https://github.com/geekstrancend/fost.git
 cd fost/landing
 
 # Install dependencies
@@ -146,13 +147,13 @@ The landing page is deployed on **Vercel** automatically on commits to `main`:
 ```bash
 # Manual deploy
 vercel deploy --prod
-```
+```yaml
 
 See [Vercel docs](https://vercel.com/docs) for more options.
 
 ## 📁 Landing Page Structure
 
-```
+```plaintext
 app/
 ├── components/
 │   ├── Hero.tsx           # Main headline, CTAs, quick start
@@ -171,6 +172,7 @@ app/
 ## 🎨 Customization
 
 Edit **[app/constants.ts](app/constants.ts)** to update:
+
 - Site title, tagline, description
 - GitHub, npm, and docs links
 - Social media links
@@ -207,11 +209,12 @@ CMD ["npm", "start"]
 
 ## � Performance
 
-## 🐛 Troubleshooting
+### Troubleshooting
 
-### Build fails with module not found
+#### Build fails with module not found
 
 Ensure Node modules are installed:
+
 ```bash
 rm -rf node_modules package-lock.json
 npm install
@@ -261,10 +264,10 @@ MIT — See [LICENSE](../LICENSE) for details.
 - Built with [Next.js](https://nextjs.org/)
 - Styled with [Tailwind CSS](https://tailwindcss.com)
 - Animation by [Framer Motion](https://www.framer.com/motion/)
-- Part of the [FOST](https://github.com/Emmyhack/fost) project
+- Part of the [FOST](https://github.com/geekstrancend/fost) project
 
 ---
 
 **Status**: 🟡 Alpha  
 **Last Updated**: March 5, 2026  
-**GitHub**: [Emmyhack/fost](https://github.com/Emmyhack/fost)
+**GitHub**: [geekstrancend/fost](https://github.com/geekstrancend/fost)

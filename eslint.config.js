@@ -1,6 +1,7 @@
 const js = require('@eslint/js');
 const tsParser = require('@typescript-eslint/parser');
 const tsPlugin = require('@typescript-eslint/eslint-plugin');
+const prettier = require('eslint-config-prettier');
 
 module.exports = [
   {
@@ -92,4 +93,5 @@ module.exports = [
       'no-console': 'off',
     },
   },
+  prettier,
 ];

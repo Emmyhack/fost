@@ -2,10 +2,10 @@
   "name": "fost",
   "version": "0.1.0",
   "description": "AI-powered SDK generator for Web2 and Web3 APIs. Generate fully-typed, documented TypeScript SDKs in minutes from OpenAPI or smart contract ABIs.",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
-    "fost": "./bin/fost.js"
+    "fost": "./dist/cli/index.js"
   },
   "files": [
     "dist/",
@@ -41,20 +41,21 @@
   "license": "MIT",
   "exports": {
     ".": {
-      "types": "./dist/src/index.d.ts",
-      "default": "./dist/src/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
     },
     "./cli": {
-      "types": "./dist/src/cli/index.d.ts",
-      "default": "./dist/src/cli/index.js"
+      "types": "./dist/cli/index.d.ts",
+      "require": "./dist/cli/index.js"
     },
     "./errors": {
-      "types": "./dist/src/errors/index.d.ts",
-      "default": "./dist/src/errors/index.js"
+      "types": "./dist/errors/index.d.ts",
+      "require": "./dist/errors/index.js"
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node ./scripts/add-shebang.js",
     "watch": "tsc --watch",
     "test": "vitest run --coverage",
     "test:unit": "vitest run --coverage",
@@ -62,8 +63,11 @@
     "test:watch": "vitest watch",
     "lint": "eslint src",
     "lint:format": "prettier --check .",
-    "cli": "node dist/src/cli/index.js",
+    "cli": "node dist/cli/index.js",
     "prepublishOnly": "npm run build && npm run test",
+    "release": "standard-version",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major",
     "batch:generate": "ts-node scripts/batch-generate.ts",
     "publish:sdk": "ts-node scripts/publish-sdk.ts",
     "ci:local": "npm run build && npm run batch:generate -- --specs-dir ./api-specs --output ./generated-sdks --languages typescript,python",
@@ -76,6 +80,8 @@
     "@typescript-eslint/parser": "^7.18.0",
     "@vitest/coverage-v8": "^2.0.5",
     "eslint": "^9.9.0",
+    "eslint-config-prettier": "^9.1.0",
+    "standard-version": "^9.5.0",
     "typescript": "^5.5.4",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^2.0.5"
