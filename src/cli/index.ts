@@ -26,8 +26,12 @@ import type {
   CLIOptions,
   GenerationResult,
   ValidationResult,
+  ValidationError,
+  ValidationWarning,
   TestResult,
+  TestFailure,
   LintResult,
+  LintIssue,
 } from "./types";
 import { CLIUsageError, GenerationError, ConfigError, FileSystemError } from "../errors/base";
 
@@ -465,7 +469,7 @@ See [fost documentation](https://docs.fost.dev) for more information.
 
         if (!validation.valid) {
           this.logger.error("Validation failed:");
-          validation.errors.forEach((err) => {
+          validation.errors.forEach((err: ValidationError) => {
             this.logger.error(`  - ${err.message}`);
           });
           throw new GenerationError("Validation failed");
@@ -495,10 +499,10 @@ See [fost documentation](https://docs.fost.dev) for more information.
       if (!validation.valid) {
         this.progress.error("");
         this.logger.error("Input validation failed:");
-        validation.errors.forEach((err) => {
+        validation.errors.forEach((err: ValidationError) => {
           this.logger.error(`  ${err.code}: ${err.message}${err.location ? ` (${err.location})` : ''}`);
         });
-        validation.warnings.forEach((warn) => {
+        validation.warnings.forEach((warn: ValidationWarning) => {
           this.logger.warn(`  ${warn.code}: ${warn.message}${warn.location ? ` (${warn.location})` : ''}`);
           if (warn.suggestion) {
             this.logger.info(`    Suggestion: ${warn.suggestion}`);
@@ -622,10 +626,10 @@ See [fost documentation](https://docs.fost.dev) for more information.
       } else {
         this.progress.error("");
         this.logger.error("Validation failed:");
-        result.errors.forEach((err) => {
+        result.errors.forEach((err: ValidationError) => {
           this.logger.error(`  [${err.code}] ${err.message}${err.location ? ` (${err.location})` : ''}`);
         });
-        result.warnings.forEach((warn) => {
+        result.warnings.forEach((warn: ValidationWarning) => {
           this.logger.warn(`  [${warn.code}] ${warn.message}${warn.location ? ` (${warn.location})` : ''}`);
           if (warn.suggestion) {
             this.logger.info(`    Suggestion: ${warn.suggestion}`);
@@ -676,7 +680,7 @@ See [fost documentation](https://docs.fost.dev) for more information.
       } else {
         this.progress.error("");
         this.logger.error(`${result.failed} test(s) failed:`);
-        result.failures.forEach((failure) => {
+        result.failures.forEach((failure: TestFailure) => {
           this.logger.error(`  - ${failure.name}: ${failure.error}`);
         });
         throw new GenerationError("Tests failed");
@@ -724,7 +728,7 @@ See [fost documentation](https://docs.fost.dev) for more information.
         if (!options.fix) {
           const issueSummary = result.issues
             .slice(0, 5)
-            .map((issue) => `  - ${issue.file}: ${issue.message}`)
+            .map((issue: LintIssue) => `  - ${issue.file}: ${issue.message}`)
             .join("\n");
           this.logger.warn(`\n${issueSummary}`);
         }
