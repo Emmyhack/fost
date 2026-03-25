@@ -61,34 +61,44 @@ const response = await client.resources.list();`,
 
 export const FEATURES = [
   {
-    title: 'Full Stack Support',
+    title: 'Multi-Language Support',
     description:
-      'Generate SDKs for REST APIs, GraphQL endpoints, and smart contract ABIs from a single tool.',
+      'Generate production-ready SDKs in TypeScript, Python, Go, Rust, Java, C#, Swift, and Kotlin from a single specification.',
   },
   {
-    title: 'AI-Optimized Architecture',
+    title: 'Multiple Input Formats',
     description:
-      'Intelligent method grouping, semantic naming, and DX improvements powered by large language models.',
+      'Support for OpenAPI, GraphQL schemas, Postman collections, Solana IDL, and smart contract ABIs with automatic format detection.',
   },
   {
-    title: 'Deterministic Generation',
+    title: 'Advanced SDK Patterns',
     description:
-      'Consistent, reproducible output every time. Same input always produces identical SDKs for version control.',
+      'Pagination strategies (offset, cursor, keyset), streaming support, type-safe request builders, and resilient error handling built-in.',
+  },
+  {
+    title: 'Automatic Test Generation',
+    description:
+      'Generate unit tests, integration tests with MSW mocking, Web3 contract tests, and CI/CD pipelines with coverage reporting.',
+  },
+  {
+    title: 'Enterprise-Grade Quality',
+    description:
+      'Retry policies with exponential backoff, timeout management, circuit breakers, and mock clients for comprehensive testing.',
+  },
+  {
+    title: 'AI-Powered Intelligence',
+    description:
+      'Semantic naming, intelligent method grouping, and optimization rules powered by large language models for superior DX.',
   },
   {
     title: 'Complete Documentation',
     description:
-      'Auto-generated JSDoc comments, README files, and usage examples included with every SDK.',
+      'Auto-generated JSDoc comments, README files, API documentation, and usage examples included with every SDK.',
   },
   {
-    title: 'Type-Safe by Default',
+    title: 'Self-Owned Forever',
     description:
-      'TypeScript-first with complete type definitions, generics, and discriminated unions for IDE support.',
-  },
-  {
-    title: 'Self-Hosted or Cloud',
-    description:
-      'Run locally with full privacy or use cloud infrastructure. Generated SDKs are entirely yours to maintain.',
+      'Fully typed, tree-shakeable output. Run locally with full privacy. Generated SDKs are entirely yours to maintain and modify.',
   },
 ];
 
@@ -152,7 +162,17 @@ export const FAQ_ITEMS = [
   {
     question: 'What input formats are supported?',
     answer:
-      'Fost supports OpenAPI 3.x, GraphQL schemas, JSON Schema, and EVM smart contract ABIs. We continue expanding format support—custom parsers can be added for specialized use cases.',
+      'Fost supports OpenAPI 3.x, GraphQL SDL schemas, Postman Collections, Solana IDL, EVM smart contract ABIs, and JSON Schema. All parsers work with automatic format detection, and the plugin architecture enables easy addition of custom parsers for specialized formats.',
+  },
+  {
+    question: 'What languages can SDKs be generated in?',
+    answer:
+      'Fost can generate SDKs in TypeScript, Python, Go, Rust, Java, C#, Swift, and Kotlin. Each language uses idiomatic code patterns and best practices, with full type safety and comprehensive documentation.',
+  },
+  {
+    question: 'What SDK quality features are included?',
+    answer:
+      'All generated SDKs include pagination (offset, cursor, keyset), request/response streaming, type-safe request builders, retry policies with exponential backoff, timeout management, circuit breakers for resilience, and comprehensive test suites with integration and unit tests.',
   },
   {
     question: 'Does Fost have licensing costs?',

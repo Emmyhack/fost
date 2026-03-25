@@ -554,10 +554,20 @@ export interface ASTConditionalExpression extends ASTExpression {
 
 export interface ASTVariableDeclaration extends ASTStatement {
   type: "VariableDeclaration";
-  kind: "const" | "let" | "var";
+  // BUGFIX 1: Widen kind to string to support raw assignment strings in generators
+  // while under migration. This is a compat shim; long-term use ASTRawStatement.
+  kind: "const" | "let" | "var" | string;
   name: string;
   valueType?: string;
   initializer?: ASTExpression;
+}
+
+// BUGFIX 1: New AST node for raw code statements used by generators for assignments,
+// super() calls, and other raw expressions that don't fit the VariableDeclaration shape.
+// Emitted verbatim + semicolon. Generators should migrate to this instead of misusing kind.
+export interface ASTRawStatement extends ASTStatement {
+  type: "RawStatement";
+  code: string; // emitted verbatim + semicolon
 }
 
 export interface ASTFunctionDeclaration extends ASTStatement {

@@ -15,6 +15,9 @@ export type InputSpecType =
   | "swagger-2.0"
   | "contract-abi"
   | "chain-metadata"
+  | "graphql"
+  | "postman"
+  | "solana-idl"
   | "custom";
 
 export interface InputSpec {

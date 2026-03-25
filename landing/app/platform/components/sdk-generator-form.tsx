@@ -278,10 +278,10 @@ export function SDKGeneratorForm({ onSuccess }: { onSuccess?: () => void }) {
             ) : (
               <>
                 <p className="mb-1 text-sm font-mono font-semibold text-gray-700">
-                  Drag & drop your OpenAPI spec or click to browse
+                  Drag & drop your OpenAPI/GraphQL spec or click to browse
                 </p>
                 <p className="text-xs text-gray-600 font-mono">
-                  Supported formats: JSON, YAML (max 5MB)
+                  Supported formats: OpenAPI, GraphQL, Postman Collections (JSON, YAML - max 5MB)
                 </p>
                 <button
                   onClick={() => fileInputRef.current?.click()}
@@ -296,6 +296,17 @@ export function SDKGeneratorForm({ onSuccess }: { onSuccess?: () => void }) {
             <p className="mt-2 text-xs text-red-600 font-mono">{fileError}</p>
           )}
         </div>
+
+        {!isWeb3 && uploadedFile && (
+          <div className="mb-6 rounded bg-blue-50 p-3 text-xs font-mono text-gray-600">
+            <p className="mb-2">
+              Generated SDKs include: Automatic pagination • Request streaming • Type-safe builders • Retry policies • Timeout management • Circuit breakers
+            </p>
+            <p>
+              All SDKs come with full JSDoc documentation, comprehensive tests, and CI/CD workflows
+            </p>
+          </div>
+        )}
       )}
 
       {/* Web3 Config */}
@@ -359,7 +370,10 @@ export function SDKGeneratorForm({ onSuccess }: { onSuccess?: () => void }) {
           )}
 
           <p className="text-xs text-gray-600 font-mono">
-            Features: Wallet integration • Gas estimation • Event subscriptions • Multi-chain support
+            Features: Type-safe contract interactions • Event subscriptions • Multi-chain support • Gas estimation • Error handling • Wallet integration
+          </p>
+          <p className="text-xs text-gray-500 font-mono mt-1">
+            Generated SDKs include: Pagination • Streaming • Request builders • Retry policies • Timeouts • Circuit breakers • Full test coverage
           </p>
         </div>
       )}

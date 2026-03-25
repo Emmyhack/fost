@@ -60,14 +60,6 @@ export class CLIApplication {
    * @throws {FileSystemError} If file operations fail
    * @throws {ConfigError} If configuration generation fails
    */
-  /**
-   * Initialize a new Fost project with starter files
-   * Creates configuration, sample specs, environment files, and documentation
-   *
-   * @param options - Init command options
-   * @throws {FileSystemError} If file operations fail
-   * @throws {ConfigError} If configuration generation fails
-   */
   private async handleInit(options: InitOptions): Promise<void> {
     const projectType = options.type || "web2"; // web2 or web3
     const projectName = options.name || "my-sdk";
@@ -499,10 +491,10 @@ See [fost documentation](https://docs.fost.dev) for more information.
       if (!validation.valid) {
         this.progress.error("");
         this.logger.error("Input validation failed:");
-        validation.errors.forEach((err: ValidationError) => {
+        (validation.errors ?? []).forEach((err: ValidationError) => {
           this.logger.error(`  ${err.code}: ${err.message}${err.location ? ` (${err.location})` : ''}`);
         });
-        validation.warnings.forEach((warn: ValidationWarning) => {
+        (validation.warnings ?? []).forEach((warn: ValidationWarning) => {
           this.logger.warn(`  ${warn.code}: ${warn.message}${warn.location ? ` (${warn.location})` : ''}`);
           if (warn.suggestion) {
             this.logger.info(`    Suggestion: ${warn.suggestion}`);
@@ -626,10 +618,10 @@ See [fost documentation](https://docs.fost.dev) for more information.
       } else {
         this.progress.error("");
         this.logger.error("Validation failed:");
-        result.errors.forEach((err: ValidationError) => {
+        (result.errors ?? []).forEach((err: ValidationError) => {
           this.logger.error(`  [${err.code}] ${err.message}${err.location ? ` (${err.location})` : ''}`);
         });
-        result.warnings.forEach((warn: ValidationWarning) => {
+        (result.warnings ?? []).forEach((warn: ValidationWarning) => {
           this.logger.warn(`  [${warn.code}] ${warn.message}${warn.location ? ` (${warn.location})` : ''}`);
           if (warn.suggestion) {
             this.logger.info(`    Suggestion: ${warn.suggestion}`);
@@ -680,7 +672,7 @@ See [fost documentation](https://docs.fost.dev) for more information.
       } else {
         this.progress.error("");
         this.logger.error(`${result.failed} test(s) failed:`);
-        result.failures.forEach((failure: TestFailure) => {
+        (result.failures ?? []).forEach((failure: TestFailure) => {
           this.logger.error(`  - ${failure.name}: ${failure.error}`);
         });
         throw new GenerationError("Tests failed");
@@ -726,7 +718,7 @@ See [fost documentation](https://docs.fost.dev) for more information.
         this.progress.complete(message);
 
         if (!options.fix) {
-          const issueSummary = result.issues
+          const issueSummary = (result.issues ?? [])
             .slice(0, 5)
             .map((issue: LintIssue) => `  - ${issue.file}: ${issue.message}`)
             .join("\n");
@@ -813,10 +805,10 @@ See [fost documentation](https://docs.fost.dev) for more information.
    * Print version information
    */
   private handleVersion(): void {
-    // Use dynamic require for version
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const version = require("../../package.json").version as string;
-    console.log(`fost ${version}`);
+    // Use require for package.json version (CommonJS-safe)
+    // eslint-disable-next-line @typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires
+    const pkg = require("../../package.json") as { version: string };
+    console.log(`fost ${pkg.version}`);
   }
 
   /**
@@ -842,13 +834,19 @@ See [fost documentation](https://docs.fost.dev) for more information.
  * Auto-execute CLI when this file is run directly
  * This allows the compiled dist/cli/index.js to be used as a bin entry point
  */
-if (require.main === module) {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { bootstrap } = require('./bootstrap');
+const isMain =
+  typeof process !== "undefined" &&
+  process.argv[1] != null &&
+  process.argv[1].endsWith("cli/index.js");
+
+if (isMain) {
+  // Use dynamic import for bootstrap (ESM-safe)
+  // eslint-disable-next-line @typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires
+  const { bootstrap } = require("./bootstrap");
   bootstrap({ argv: process.argv.slice(2) })
     .catch((error: unknown) => {
       if (error instanceof Error) {
-        console.error('Fatal error:', error.message);
+        console.error("Fatal error:", error.message);
       }
       process.exit(1);
     });

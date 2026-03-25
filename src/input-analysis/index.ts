@@ -30,10 +30,21 @@ export {
 // Main normalizer
 export { InputNormalizer, normalizeInput, getNormalizer, type NormalizationResult } from "./normalizer";
 
+// Parser Registry and Plugin System
+export {
+  ParserRegistry,
+  ParserPlugin,
+  getParserRegistry,
+  registerParser,
+} from "./parser-registry";
+
 // Parsers (for custom registration)
 export { OpenAPIParser } from "./parsers/openapi";
 export { ContractABIParser } from "./parsers/contract-abi";
 export { ChainMetadataParser, PREDEFINED_CHAINS } from "./parsers/chain-metadata";
+export { GraphQLParser } from "./parsers/graphql";
+export { PostmanParser } from "./parsers/postman";
+export { SolanaIDLParser } from "./parsers/solana-idl";
 
 // Examples
 export {

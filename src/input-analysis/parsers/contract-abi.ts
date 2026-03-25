@@ -18,8 +18,24 @@ import {
   ParserResult,
 } from "../types";
 import { BaseParser } from "../base-parser";
+import type { ParserPlugin } from "../parser-registry";
 
-export class ContractABIParser extends BaseParser {
+export class ContractABIParser extends BaseParser implements ParserPlugin {
+  displayName = "EVM Contract ABI Parser";
+  version = "1.0.0";
+  supportedTypes = ["contract-abi"];
+
+  detectConfidence(input: InputSpec): number {
+    if (input.type === "contract-abi") return 1.0;
+    if (
+      Array.isArray(input.rawContent) &&
+      input.rawContent.some((item: any) => item.type === "function" || item.type === "event")
+    ) {
+      return 0.8;
+    }
+    return 0;
+  }
+
   canParse(input: InputSpec): boolean {
     return input.type === "contract-abi";
   }

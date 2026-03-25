@@ -26,8 +26,27 @@ import {
   classifyParameterLocation,
   isFieldRequired,
 } from "../base-parser";
+import type { ParserPlugin } from "../parser-registry";
 
-export class OpenAPIParser extends BaseParser {
+export class OpenAPIParser extends BaseParser implements ParserPlugin {
+  displayName = "OpenAPI/Swagger Parser";
+  version = "1.0.0";
+  supportedTypes = ["openapi-3.0", "openapi-3.1", "swagger-2.0"];
+
+  detectConfidence(input: InputSpec): number {
+    if (this.canParse(input)) {
+      if (input.type === "openapi-3.0" || input.type === "openapi-3.1" || input.type === "swagger-2.0") {
+        return 1.0;
+      }
+      // Content-based detection
+      if (typeof input.rawContent === "object" && input.rawContent) {
+        if (input.rawContent.openapi) return 0.95;
+        if (input.rawContent.swagger) return 0.95;
+      }
+    }
+    return 0;
+  }
+
   canParse(input: InputSpec): boolean {
     return (
       input.type === "openapi-3.0" ||
