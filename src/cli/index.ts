@@ -14,7 +14,7 @@ import { createGeneratorAPI } from "../api/generator-api";
 import { createProgressReporter } from "./progress-reporter";
 import { createLogger } from "./logger";
 import { parseArguments, parseConfig } from "./argument-parser";
-import { HELP_MESSAGES, ERROR_MESSAGES, SUCCESS_MESSAGES } from "./constants";
+import { HELP_MESSAGES } from "./constants";
 import type {
   Logger,
   ProgressReporter,
@@ -24,13 +24,9 @@ import type {
   TestOptions,
   LintOptions,
   CLIOptions,
-  GenerationResult,
-  ValidationResult,
   ValidationError,
   ValidationWarning,
-  TestResult,
   TestFailure,
-  LintResult,
   LintIssue,
 } from "./types";
 import { CLIUsageError, GenerationError, ConfigError, FileSystemError } from "../errors/base";
@@ -309,7 +305,6 @@ export class CLIApplication {
    * Generate README content for new projects
    */
   private generateReadme(projectType: "web2" | "web3", projectName: string): string {
-    const envVarName = projectType === "web3" ? "RPC_ENDPOINT" : "API_KEY";
     const clientConfig = projectType === "web3"
       ? "rpc: process.env.RPC_ENDPOINT"
       : "apiKey: process.env.API_KEY";
@@ -806,7 +801,7 @@ See [fost documentation](https://docs.fost.dev) for more information.
    */
   private handleVersion(): void {
     // Use require for package.json version (CommonJS-safe)
-    // eslint-disable-next-line @typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const pkg = require("../../package.json") as { version: string };
     console.log(`fost ${pkg.version}`);
   }
@@ -836,12 +831,12 @@ See [fost documentation](https://docs.fost.dev) for more information.
  */
 const isMain =
   typeof process !== "undefined" &&
-  process.argv[1] != null &&
+  process.argv[1] !== null &&
   process.argv[1].endsWith("cli/index.js");
 
 if (isMain) {
   // Use dynamic import for bootstrap (ESM-safe)
-  // eslint-disable-next-line @typescript-eslint/no-require-imports,@typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { bootstrap } = require("./bootstrap");
   bootstrap({ argv: process.argv.slice(2) })
     .catch((error: unknown) => {

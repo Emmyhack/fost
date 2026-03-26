@@ -152,7 +152,7 @@ export class FallbackStrategy {
       try {
         const result = this.tier3TemplateGenerator(options.input, fallback.template);
         return { success: true, result };
-      } catch (error) {
+      } catch {
         return { success: false };
       }
     }

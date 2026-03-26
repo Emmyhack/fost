@@ -12,7 +12,6 @@ import {
   NormalizedType,
   NormalizedOperation,
   NormalizedParameter,
-  NormalizedNetwork,
   ParserResult,
 } from "../types";
 import { BaseParser } from "../base-parser";
@@ -219,7 +218,7 @@ export class SolanaIDLParser extends BaseParser implements ParserPlugin {
     return "any";
   }
 
-  private extractOperations(instructions: any[], types: Record<string, any>): NormalizedOperation[] {
+  private extractOperations(instructions: any[], _types: Record<string, any>): NormalizedOperation[] {
     const operations: NormalizedOperation[] = [];
 
     for (let i = 0; i < instructions.length; i++) {

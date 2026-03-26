@@ -12,11 +12,9 @@ import {
   NormalizedType,
   NormalizedOperation,
   NormalizedParameter,
-  NormalizedAuth,
-  NormalizedNetwork,
   ParserResult,
 } from "../types";
-import { BaseParser, extractType, normalizeHttpMethod } from "../base-parser";
+import { BaseParser } from "../base-parser";
 import type { ParserPlugin } from "../parser-registry";
 
 export class GraphQLParser extends BaseParser implements ParserPlugin {
@@ -254,7 +252,6 @@ export class GraphQLParser extends BaseParser implements ParserPlugin {
     const params: NormalizedParameter[] = [];
     const paramPattern = /(\w+)\s*:\s*([^,)=]+)/g;
     let match;
-    let index = 0;
 
     while ((match = paramPattern.exec(paramsStr)) !== null) {
       const paramName = match[1];

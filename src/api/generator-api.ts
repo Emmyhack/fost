@@ -22,8 +22,8 @@ export interface GeneratorAPI {
   validateGeneration(config: GenerationValidationConfig): Promise<GenerationValidationResult>;
   runTests(config: TestConfig): Promise<TestResult>;
   lintCode(config: LintConfig): Promise<LintResult>;
-  getConfig(): Promise<any>;
-  setConfig(key: string, value: any): Promise<void>;
+  getConfig(): Promise<Record<string, unknown>>;
+  setConfig(key: string, value: unknown): Promise<void>;
   resetConfig(): Promise<void>;
   getCompletion(shell: string): Promise<string>;
 }
@@ -171,7 +171,7 @@ export function createGeneratorAPI(): GeneratorAPI {
   /**
    * Load input file based on extension
    */
-  const loadInputFile = (filePath: string): { content: any; format: "json" | "yaml" } => {
+  const loadInputFile = (filePath: string): { content: unknown; format: "json" | "yaml" } => {
     const content = fs.readFileSync(filePath, "utf-8");
 
     if (filePath.endsWith(".json")) {

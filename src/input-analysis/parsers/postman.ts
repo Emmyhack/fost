@@ -194,6 +194,7 @@ export class PostmanParser extends BaseParser implements ParserPlugin {
 
   private extractPath(url: string): string {
     try {
+      /* global URL */
       const urlObj = new URL(url);
       return urlObj.pathname + urlObj.search;
     } catch {

@@ -162,7 +162,7 @@ export class PromptRegistry {
     let totalVersions = 0;
     let deprecatedVersions = 0;
 
-    for (const [_, versions] of this.prompts.entries()) {
+    for (const [, versions] of this.prompts.entries()) {
       totalPrompts++;
       totalVersions += versions.length;
 
@@ -194,7 +194,7 @@ export class PromptRegistry {
   import(data: Record<string, PromptVersion[]>): void {
     this.prompts.clear();
 
-    for (const [_id, versions] of Object.entries(data)) {
+    for (const [, versions] of Object.entries(data)) {
       for (const version of versions) {
         this.register(version);
       }

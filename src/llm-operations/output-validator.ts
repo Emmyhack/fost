@@ -35,7 +35,7 @@ export class OutputValidator {
       if (typeof output === 'string') {
         try {
           output = JSON.parse(output);
-        } catch (e) {
+        } catch {
           errors.push({
             type: 'SCHEMA',
             message: 'Output is not valid JSON',

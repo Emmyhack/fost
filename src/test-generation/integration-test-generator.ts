@@ -85,7 +85,6 @@ export class IntegrationTestGenerator {
    */
   private generateTest(endpoint: ApiEndpoint): string {
     const testName = `${endpoint.method} ${endpoint.path} - ${endpoint.description}`;
-    const method = endpoint.method.toLowerCase();
 
     const testCode = `  it("${testName}", async () => {
     const response = await fetch("${this.baseUrl}${endpoint.path}", {

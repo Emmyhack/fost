@@ -331,7 +331,7 @@ export class StreamPipeline<TIn, TOut = TIn> {
   /**
    * Add error handler
    */
-  onError(handler: (error: Error) => void): this {
+  onError(_handler: (error: Error) => void): this {
     // Store error handler for pipeline execution
     return this;
   }

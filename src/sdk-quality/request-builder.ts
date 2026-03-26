@@ -22,7 +22,7 @@ export interface RequestConfig {
 /**
  * Type-safe field configuration
  */
-export interface FieldSchema<T> {
+export interface FieldSchema {
   name: string;
   type: string;
   required?: boolean;
@@ -51,7 +51,7 @@ export class TypeSafeRequestBuilder<T extends Record<string, any>> {
     query: {},
   };
 
-  private schema: Map<string, FieldSchema<any>> = new Map();
+  private schema: Map<string, FieldSchema> = new Map();
   private data: Partial<T> = {};
   private errors: FieldError[] = [];
 
@@ -143,7 +143,7 @@ export class TypeSafeRequestBuilder<T extends Record<string, any>> {
    */
   defineField<K extends keyof T>(
     name: K,
-    schema: FieldSchema<T[K]>
+    schema: FieldSchema
   ): this {
     this.schema.set(String(name), schema);
     return this;
@@ -419,6 +419,7 @@ export class QueryBuilder {
    * Build query string
    */
   buildQueryString(): string {
+    /* global URLSearchParams */
     const params = new URLSearchParams();
 
     for (const filter of this.filters) {

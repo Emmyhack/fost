@@ -120,7 +120,7 @@ export class SpecToTemplateConverter {
 
     const typeRecord = normalizedSpec.types;
     if (typeRecord && typeof typeRecord === "object") {
-      for (const [_key, type] of Object.entries(typeRecord)) {
+      for (const [, type] of Object.entries(typeRecord)) {
         if (!type) continue;
 
         const properties: PropertyInfo[] = (type.fields

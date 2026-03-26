@@ -5,8 +5,6 @@
  * No AI - pure template-driven code generation with deterministic output.
  */
 
-import * as fs from "fs";
-
 export interface TemplateContext {
   apiName: string;
   apiVersion: string;

@@ -6,7 +6,7 @@
  */
 
 import * as AST from "../types";
-import { CodeBuilder, type EmitterOptions, DEFAULT_EMITTER_OPTIONS } from "../emitter";
+import { type EmitterOptions, DEFAULT_EMITTER_OPTIONS } from "../emitter";
 
 /**
  * Simple Python code emitter

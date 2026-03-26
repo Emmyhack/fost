@@ -120,8 +120,7 @@ export class ConfigLoader {
     try {
       // Clear require cache to ensure fresh load
       delete require.cache[require.resolve(filePath)];
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const module = require(filePath);
+      const { defaultExport: module } = await import(filePath);
       const config = module.default || module;
       
       if (!config || typeof config !== 'object') {
@@ -146,8 +145,7 @@ export class ConfigLoader {
     try {
       // Clear require cache to ensure fresh load
       delete require.cache[require.resolve(filePath)];
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const module = require(filePath);
+      const { defaultExport: module } = await import(filePath);
       const config = module.default || module;
 
       if (!config || typeof config !== 'object') {
