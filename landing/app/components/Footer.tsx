@@ -106,7 +106,7 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     className="text-gray-400 hover:text-accent-green transition-colors"
                   >
-                    Twitter
+                    X
                   </Link>
                 </li>
                 <li>
