@@ -57,7 +57,7 @@
   "scripts": {
     "build": "tsc && node ./scripts/add-shebang.js",
     "watch": "tsc --watch",
-    "test": "vitest run --coverage",
+    "test": "npm run build && vitest run --coverage",
     "test:unit": "vitest run --coverage",
     "test:e2e": "vitest run tests/e2e",
     "test:watch": "vitest watch",
