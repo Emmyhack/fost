@@ -4,7 +4,7 @@ import { useAuth } from '../auth/auth-context';
 import { DashboardHeader } from '../components/dashboard-header';
 import { SDKGeneratorForm } from '../components/sdk-generator-form';
 import PricingModal from '../components/pricing-modal';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface UserStats {
@@ -14,11 +14,19 @@ interface UserStats {
 }
 
 export default function DashboardPage() {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const { user, isAuthenticated } = useAuth();
   const [stats, setStats] = useState<UserStats>({ sdksGenerated: 0, specsProcessed: 0, chainsSupported: 5 });
   const [statsLoading, setStatsLoading] = useState(true);
   const [isPricingOpen, setIsPricingOpen] = useState(false);
   const [userCredits, setUserCredits] = useState(0);
+
+  // Redirect immediately if not authenticated (no loading state)
+  useEffect(() => {
+    if (!isAuthenticated && user === null) {
+      router.push('/platform/auth/login?next=/platform/dashboard');
+    }
+  }, [isAuthenticated, user, router]);
 
   useEffect(() => {
     if (isAuthenticated && user?.id) {
@@ -44,19 +52,27 @@ export default function DashboardPage() {
     }
   };
 
-  if (isLoading) {
+  // Show skeleton loaders while authenticated but data is loading
+  if (isAuthenticated && statsLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center font-mono">
-          <div className="mb-4 text-2xl font-bold">FOST</div>
-          <div>Loading...</div>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-white to-gray-50">
+        <DashboardHeader />
+        <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="mb-12 animate-pulse">
+            <div className="h-8 w-48 bg-gray-200 rounded mb-2"></div>
+            <div className="h-4 w-96 bg-gray-200 rounded"></div>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3 mb-12">
+            {[1,2,3].map(i => <div key={i} className="h-32 bg-gray-200 rounded"></div>)}
+          </div>
+        </main>
       </div>
     );
   }
 
+  // If not authenticated and not redirecting, show nothing
   if (!isAuthenticated) {
-    redirect('/platform/auth/login');
+    return null;
   }
 
   return (

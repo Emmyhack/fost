@@ -27,6 +27,11 @@ export default function LoginPage() {
     }
   };
 
+  const fillDemoCredentials = () => {
+    setEmail('demo@fost.dev');
+    setPassword('demo12345');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
@@ -94,10 +99,18 @@ export default function LoginPage() {
         </form>
 
         {/* Demo Credentials */}
-        <div className="mt-6 rounded bg-gray-50 p-4 text-xs font-mono text-gray-600">
-          <p className="font-semibold mb-2">Demo Credentials:</p>
-          <p>Email: demo@fost.dev</p>
-          <p>Password: demo12345</p>
+        <div className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+          <p className="text-sm font-mono font-semibold text-blue-900 mb-3">Want to explore first?</p>
+          <button
+            type="button"
+            onClick={fillDemoCredentials}
+            className="w-full rounded bg-blue-500 px-4 py-2 font-mono text-sm font-semibold text-white hover:bg-blue-600 transition-colors"
+          >
+            Fill Demo Credentials
+          </button>
+          <p className="text-xs text-blue-700 mt-2 font-mono">
+            This will auto-fill the form above. The password field remains masked for security.
+          </p>
         </div>
       </div>
     </div>

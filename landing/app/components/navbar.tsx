@@ -25,7 +25,7 @@ export function Navbar() {
               Pricing
             </Link>
             <a
-              href="https://github.com/emmyhack/fost"
+              href="https://github.com/geekstrancend/fost"
               target="_blank"
               rel="noopener noreferrer"
               className="font-mono text-sm hover:text-accent-green"

@@ -7,10 +7,13 @@ export const SITE_CONFIG = {
   title: 'Fost',
   tagline: 'Generate Production-Ready SDKs Automatically',
   description: 'AI-powered SDK generation for Web2 and Web3 APIs. Create fully-typed, documented SDKs in minutes.',
-  github: 'https://github.com/Emmyhack/fost',
+  github: 'https://github.com/geekstrancend/fost',
   npm: 'https://www.npmjs.com/package/fost',
-  docs: 'https://github.com/Emmyhack/fost#documentation',
-  twitter: 'https://twitter.com/fostdev',
+  docs: '/docs',
+  docsWeb2: '/docs/rest-api/introduction',
+  docsWeb3: '/docs/web3/overview',
+  docsPlugins: '/docs/getting-started',
+  twitter: 'https://x.com/fostsdkagent',
 };
 
 export const ACCENT_GREEN = '#10B981';

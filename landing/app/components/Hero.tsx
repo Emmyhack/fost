@@ -56,9 +56,26 @@ export default function Hero() {
 
           <div className="bg-white bg-opacity-70 backdrop-blur-sm border border-gray-200 rounded-lg p-4 shadow-lg">
             <h3 className="font-mono font-bold text-sm mb-3 text-accent-green">📚 New Guides</h3>
-            <p className="text-xs text-gray-600 font-mono">
-              Comprehensive guides for <span className="font-bold">Web2</span> (REST APIs), <span className="font-bold">Web3</span> (smart contracts), and <span className="font-bold">plugins</span>
-            </p>
+            <div className="flex flex-col gap-2">
+              <Link
+                href={SITE_CONFIG.docsWeb2}
+                className="text-xs font-mono text-accent-green hover:text-accent-green-dark transition-colors underline"
+              >
+                → Web2 Guide (REST APIs)
+              </Link>
+              <Link
+                href={SITE_CONFIG.docsWeb3}
+                className="text-xs font-mono text-accent-green hover:text-accent-green-dark transition-colors underline"
+              >
+                → Web3 Guide (Smart Contracts)
+              </Link>
+              <Link
+                href={SITE_CONFIG.docsPlugins}
+                className="text-xs font-mono text-accent-green hover:text-accent-green-dark transition-colors underline"
+              >
+                → Plugin Development
+              </Link>
+            </div>
           </div>
         </div>
 

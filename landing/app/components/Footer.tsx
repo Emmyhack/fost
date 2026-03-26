@@ -65,8 +65,6 @@ export default function Footer() {
                 <li>
                   <Link
                     href={SITE_CONFIG.docs}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="text-gray-400 hover:text-accent-green transition-colors"
                   >
                     Documentation
